@@ -3,9 +3,8 @@ const app = express();
 
 const port = 3000;
 
-app.use(express.json()); // This middleware is necessary to parse JSON data in the request body
+app.use(express.json());
 
-// Hard-coded registration data
 const users = [
   {
     id: 0,
@@ -32,18 +31,13 @@ const users = [
   },
 ];
 
-// POST route for registering a new user
 app.post("/api/register", (req, res) => {
-  // You can extract the user details from the request body like this
   const { name, email, password } = req.body;
 
-  // Create a new user object with the details
   const newUser = { name, email, password };
 
-  // Add the new user to the array of users
   users.push(newUser);
 
-  // Send a response back to the client
   res.status(201).json({
     message: "User registered successfully",
     user: newUser,
@@ -57,11 +51,11 @@ app.get("/api/user", (req, res) => {
   if (field1 || field2) {
     filteredUsers = users.filter((user) => {
       if (field1 && field1 !== "" && field2 && field2 !== "") {
-        return user.name === field1 && user.email === field2;
+        return user.firstName === field1 && user.emailAddress === field2;
       } else if (field1 && field1 !== "") {
-        return user.name === field1;
+        return user.firstName === field1;
       } else if (field2 && field2 !== "") {
-        return user.email === field2;
+        return user.emailAddress === field2;
       }
     });
   }
@@ -87,13 +81,10 @@ app.put("/api/user/:userid", (req, res) => {
 
 app.delete("/api/users/:userid");
 
-// GET route for retrieving all registered users
 app.get("/api/user", (req, res) => {
-  // Send the array of users as a JSON response
   res.json(users);
 });
 
-// Start the server
 app.listen(port, () => {
   console.log(`Server started on port ${port}`);
 });
