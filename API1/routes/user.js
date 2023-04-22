@@ -114,9 +114,11 @@ router.put("/user/:userId", (req, res) => {
 
 router.delete("/user/:userId", (req, res) => {
   const userId = parseInt(req.params.userId);
+  const index = users.findIndex((user) => user.id === userId);
   const user = getUserById(userId);
 
   if (user) {
+    users.splice(index);
     res.status(200).json({
       message: "DELETE request called!",
     });
