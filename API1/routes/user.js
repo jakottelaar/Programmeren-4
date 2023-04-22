@@ -99,8 +99,11 @@ router.put("/user/:userId", (req, res) => {
   const user = getUserById(userId);
 
   if (user) {
+    const updatedUser = { ...user, ...req.query };
+    users[user] = updatedUser;
     res.status(200).json({
       message: "PUT request called!",
+      user: updatedUser,
     });
   } else {
     res.status(404).json({
