@@ -19,7 +19,6 @@ function getUserById(userId) {
 }
 
 router.post("/user", (req, res) => {
-  // You can extract the user details from the request body like this
   const registrationRequest = ({
     firstName,
     lastName,
@@ -40,7 +39,6 @@ router.post("/user", (req, res) => {
     });
   }
 
-  // Create a new user object with the details
   const newUser = {
     id,
     firstName,
@@ -53,10 +51,8 @@ router.post("/user", (req, res) => {
     phoneNumber,
   };
 
-  // Add the new user to the array of users
   users.push(newUser);
 
-  // Send a response back to the client
   res.status(201).json({
     message: "User registered successfully",
     user: newUser,
@@ -78,9 +74,9 @@ router.get("/user", (req, res) => {
 });
 
 router.get("/user/profile", (req, res) => {
-  const testuser = users[0];
-
-  res.json(testuser);
+  res.json({
+    message: "GET Request for profile info is not yet implemented!",
+  });
 });
 
 router.get("/user/:userId", (req, res) => {
