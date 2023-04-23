@@ -99,3 +99,24 @@ describe("UC-204 Opvragen van usergegevens bij ID", () => {
       });
   });
 });
+
+describe("UC-206 Verwijderen van user", () => {
+  it("TC-206-4 Gebruiker succesvol verwijderd (Uitdaging: de user met het gegeven id is verwijderd uit de database.)", (done) => {
+    const testId = 1;
+
+    chai
+      .request(server)
+      .delete(`/api/user/${testId}`)
+      .end((err, res) => {
+        expect(err).to.be.null;
+
+        console.log(res.body);
+        let { status, message } = res.body;
+
+        expect(status).to.equal(200);
+        expect(message).to.equal(`Deleted users by id ${testId}`);
+
+        done();
+      });
+  });
+});

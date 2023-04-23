@@ -141,10 +141,12 @@ router.delete("/user/:userId", (req, res) => {
   if (user) {
     users.splice(index);
     res.status(200).json({
-      message: "DELETE request called!",
+      status: 200,
+      message: `Deleted users by id ${userId}`,
     });
   } else {
     res.status(404).json({
+      status: 404,
       error: "User not found",
     });
   }
