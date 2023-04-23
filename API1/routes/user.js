@@ -55,7 +55,8 @@ router.post("/user", (req, res) => {
 
   users.push(newUser);
 
-  res.status(201).json({
+  res.status(200).json({
+    status: 200,
     message: "User registered successfully",
     user: newUser,
   });
