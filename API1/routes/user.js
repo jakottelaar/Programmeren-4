@@ -1,6 +1,7 @@
 const express = require("express");
 const data = require("../data");
 const bodyParser = require("body-parser");
+const { assert } = require("chai");
 const router = express.Router();
 
 router.use(bodyParser.urlencoded({ extended: false }));
@@ -21,25 +22,23 @@ function getUserById(userId) {
 }
 
 router.post("/user", (req, res) => {
-  const {
-    firstName,
-    lastName,
-    street,
-    city,
-    isActive,
-    email,
-    password,
-    phoneNumber,
-  } = req.body;
+  const { firstName, lastName, street, city, email, password, phoneNumber } =
+    req.body;
 
   console.log(req.body);
-
-  const checkEmailExists = users.find((user) => user.email === email);
-
-  if (checkEmailExists) {
-    return res.status(400).json({
-      error: "Email already exists!",
+  try {
+    assert(typeof firstName === "string", "firstName must be a string!");
+    assert(typeof email === "string", "emailAddress must be a string!");
+    assert(
+      !users.find((user) => user.email === email),
+      "Email already exists!"
+    );
+  } catch (err) {
+    res.status(400).json({
+      status: 400,
+      message: err.message.toString(),
     });
+    return;
   }
 
   const newUser = {
@@ -48,7 +47,7 @@ router.post("/user", (req, res) => {
     lastName,
     street,
     city,
-    isActive,
+    isActive: true,
     email,
     password,
     phoneNumber,
@@ -60,6 +59,7 @@ router.post("/user", (req, res) => {
     message: "User registered successfully",
     user: newUser,
   });
+  return;
 });
 
 router.get("/user", (req, res) => {
