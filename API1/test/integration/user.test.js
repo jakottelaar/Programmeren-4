@@ -50,7 +50,14 @@ describe("UC-202 Opvragen van overzicht van users", () => {
         expect(res.body).to.be.an("object");
         let { status, result } = res.body;
 
-        expect(res.status).to.equal(200);
+        expect(status).to.equal(200);
+        expect(result)
+          .to.be.an("array")
+          .and.to.satisfy((users) => {
+            return users.every((user) => {
+              return typeof user === "object";
+            });
+          });
 
         done();
       });
