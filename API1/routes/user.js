@@ -8,6 +8,8 @@ router.use(express.static("public"));
 
 users = data;
 
+let index = users.length;
+
 function getUserById(userId) {
   const user = users.find((user) => user.id === userId);
 
@@ -19,7 +21,7 @@ function getUserById(userId) {
 }
 
 router.post("/user", (req, res) => {
-  const registrationRequest = ({
+  const {
     firstName,
     lastName,
     street,
@@ -28,8 +30,9 @@ router.post("/user", (req, res) => {
     email,
     password,
     phoneNumber,
-  } = req.body);
-  console.log(registrationRequest);
+  } = req.body;
+
+  console.log(req.body);
 
   const checkEmailExists = users.find((user) => user.email === email);
 
@@ -40,7 +43,7 @@ router.post("/user", (req, res) => {
   }
 
   const newUser = {
-    id,
+    id: index++,
     firstName,
     lastName,
     street,
@@ -57,7 +60,6 @@ router.post("/user", (req, res) => {
     message: "User registered successfully",
     user: newUser,
   });
-  console.log(users);
 });
 
 router.get("/user", (req, res) => {
