@@ -47,10 +47,31 @@ describe("UC-202 Opvragen van overzicht van users", () => {
         expect(err).to.be.null;
 
         console.log(res.body);
-        expect(res.body).to.be.an("array");
+        expect(res.body).to.be.an("object");
         let { status, result } = res.body;
 
         expect(res.status).to.equal(200);
+
+        done();
+      });
+  });
+});
+
+describe("UC-203 Opvragen van gebruikersprofiel", () => {
+  it("TC-203-2 Gebruiker is ingelogd met geldig token. (Niet testen op token, alleen een fictief profiel retourneren)", (done) => {
+    chai
+      .request(server)
+      .get("/api/user/profile")
+      .end((err, res) => {
+        expect(err).to.be.null;
+
+        console.log(res.body);
+        expect(res.body).to.be.an("object");
+        let { message, user } = res.body;
+        expect(message).to.equal(
+          "GET Request for profile info is not yet implemented!"
+        );
+        expect(user).to.be.an("object");
 
         done();
       });

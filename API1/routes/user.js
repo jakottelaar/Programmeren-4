@@ -91,6 +91,7 @@ router.get("/user", (req, res) => {
 router.get("/user/profile", (req, res) => {
   res.json({
     message: "GET Request for profile info is not yet implemented!",
+    user: users[0],
   });
 });
 
