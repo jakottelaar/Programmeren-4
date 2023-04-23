@@ -102,10 +102,12 @@ router.get("/user/:userId", (req, res) => {
 
   if (user) {
     res.status(200).json({
+      status: 200,
       user: user,
     });
   } else {
     res.status(404).json({
+      status: 404,
       error: "User not found",
     });
   }

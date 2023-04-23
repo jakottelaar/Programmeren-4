@@ -77,3 +77,25 @@ describe("UC-203 Opvragen van gebruikersprofiel", () => {
       });
   });
 });
+
+describe("UC-204 Opvragen van usergegevens bij ID", () => {
+  it("TC-204-3 Gebruiker-ID bestaat(De user met het gegeven id wordt geretourneerd)", (done) => {
+    const testId = "0";
+
+    chai
+      .request(server)
+      .get(`/api/user/${testId}`)
+      .end((err, res) => {
+        expect(err).to.be.null;
+
+        console.log(res.body);
+        expect(res.body).to.be.an("object");
+        let { status, user } = res.body;
+
+        expect(status).to.equal(200);
+        expect(user).to.be.an("object");
+
+        done();
+      });
+  });
+});
