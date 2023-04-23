@@ -11,6 +11,7 @@ users = data;
 
 let index = users.length;
 
+//Function for getting a user by userId
 function getUserById(userId) {
   const user = users.find((user) => user.id === userId);
 
@@ -21,6 +22,7 @@ function getUserById(userId) {
   }
 }
 
+//Post request for registration of a new user
 router.post("/user", (req, res) => {
   const { firstName, lastName, street, city, email, password, phoneNumber } =
     req.body;
@@ -63,6 +65,15 @@ router.post("/user", (req, res) => {
   return;
 });
 
+//Get request for getting all the users in the database
+router.get("/user", (req, res) => {
+  res.status(200).json({
+    status: 200,
+    result: users,
+  });
+});
+
+//Get request for getting users filtered on criteria
 router.get("/user", (req, res) => {
   const filters = req.query;
   const filteredUsers = users.filter((user) => {
@@ -76,12 +87,14 @@ router.get("/user", (req, res) => {
   res.json(filteredUsers);
 });
 
+//Get request for getting a users profile (not yet implemented)
 router.get("/user/profile", (req, res) => {
   res.json({
     message: "GET Request for profile info is not yet implemented!",
   });
 });
 
+//Get request for getting a user by their id
 router.get("/user/:userId", (req, res) => {
   const userId = parseInt(req.params.userId);
   const user = getUserById(userId);
@@ -97,6 +110,7 @@ router.get("/user/:userId", (req, res) => {
   }
 });
 
+//Put request for updating a user's profile
 router.put("/user/:userId", (req, res) => {
   const userId = parseInt(req.params.userId);
   const user = getUserById(userId);
@@ -115,6 +129,7 @@ router.put("/user/:userId", (req, res) => {
   }
 });
 
+//Delete request for deleting a user by id
 router.delete("/user/:userId", (req, res) => {
   const userId = parseInt(req.params.userId);
   const index = users.findIndex((user) => user.id === userId);
@@ -130,10 +145,6 @@ router.delete("/user/:userId", (req, res) => {
       error: "User not found",
     });
   }
-});
-
-router.get("/user", (req, res) => {
-  res.json(users);
 });
 
 module.exports = router;
