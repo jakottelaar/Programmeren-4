@@ -23,6 +23,11 @@ jobs:
         working-directory: ./API1
         run: npm install
 
+      # Give execute permission to mocha
+      - name: Add execute permission to mocha
+        working-directory: ./API1
+        run: chmod +x ./node_modules/.bin/mocha
+
       # Run tests
       - name: Run tests
         working-directory: ./API1
