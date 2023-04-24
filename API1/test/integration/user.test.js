@@ -28,10 +28,13 @@ describe("UC-201 Registreren als een nieuwe gebruiker", () => {
 
         console.log(res.body);
         expect(res.body).to.be.an("object");
-        let { status, message } = res.body;
+        let { status, message, user } = res.body;
 
         expect(status).to.equal(200);
-        expect(message).to.be.a("string").that.contains("registered");
+        expect(message)
+          .to.be.a("string")
+          .that.contains("User registered successfully");
+        expect(user).to.be.an("object");
 
         done();
       });
@@ -65,7 +68,7 @@ describe("UC-202 Opvragen van overzicht van users", () => {
 });
 
 describe("UC-203 Opvragen van gebruikersprofiel", () => {
-  it("TC-203-2 Gebruiker is ingelogd met geldig token. (Niet testen op token, alleen een fictief profiel retourneren)", (done) => {
+  it("TC-203-2 Gebruiker is ingelogd met geldig token. (Niet getest op een token, er wordt alleen een fictief profiel geretouneerd)", (done) => {
     chai
       .request(server)
       .get("/api/user/profile")
@@ -108,7 +111,7 @@ describe("UC-204 Opvragen van usergegevens bij ID", () => {
 });
 
 describe("UC-206 Verwijderen van user", () => {
-  it("TC-206-4 Gebruiker succesvol verwijderd (Uitdaging: de user met het gegeven id is verwijderd uit de database.)", (done) => {
+  it("TC-206-4 Gebruiker succesvol verwijderd", (done) => {
     const testId = 1;
 
     chai
