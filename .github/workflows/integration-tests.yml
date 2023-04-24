@@ -20,8 +20,10 @@ jobs:
 
       # Install dependencies
       - name: Install dependencies
+        working-directory: ./API1
         run: npm install
-        working-directory: Programmeren-4/API1
 
       # Run tests
-      - run: npm test
+      - name: Run tests
+        working-directory: ./API1
+        run: npm test
