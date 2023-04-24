@@ -77,7 +77,8 @@ describe("UC-203 Opvragen van gebruikersprofiel", () => {
 
         console.log(res.body);
         expect(res.body).to.be.an("object");
-        let { message, user } = res.body;
+        let { status, message, user } = res.body;
+        expect(status).to.equal(200);
         expect(message).to.equal(
           "GET Request for profile info is not yet implemented!"
         );
