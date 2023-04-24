@@ -89,7 +89,8 @@ router.get("/user", (req, res) => {
 
 //Get request for getting a users profile (not yet implemented)
 router.get("/user/profile", (req, res) => {
-  res.json({
+  res.status(200).json({
+    status: 200,
     message: "GET Request for profile info is not yet implemented!",
     user: users[0],
   });
@@ -119,14 +120,16 @@ router.put("/user/:userId", (req, res) => {
   const user = getUserById(userId);
 
   if (user) {
-    const updatedUser = { ...user, ...req.query };
-    users[user] = updatedUser;
+    const updatedUser = { ...user, ...req.body };
+    users[userId] = updatedUser;
     res.status(200).json({
+      status: 200,
       message: "PUT request called!",
       user: updatedUser,
     });
   } else {
     res.status(404).json({
+      status: 404,
       error: "User not found",
     });
   }
