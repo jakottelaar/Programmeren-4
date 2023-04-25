@@ -52,10 +52,11 @@ describe("UC-202 Opvragen van overzicht van users", () => {
 
         console.log(res.body);
         expect(res.body).to.be.an("object");
-        let { status, result } = res.body;
+        let { status, message, data } = res.body;
 
         expect(status).to.equal(200);
-        expect(result)
+        expect(message).to.contain("user: get all users endpoint");
+        expect(data)
           .to.be.an("array")
           .and.to.satisfy((users) => {
             return users.every((user) => {
