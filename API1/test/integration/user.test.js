@@ -46,6 +46,7 @@ describe("UC-202 Opvragen van overzicht van users", () => {
     chai
       .request(server)
       .get("/api/user")
+      .timeout(5000)
       .end((err, res) => {
         expect(err).to.be.null;
 
