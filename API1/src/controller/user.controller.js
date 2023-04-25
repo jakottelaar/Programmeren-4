@@ -1,7 +1,8 @@
-const database = require("../util/database");
+const database = require("../util/internal-mem-database");
 const logger = require("../util/utils").logger;
 const assert = require("assert");
 const users = database.users;
+const pool = require("../util/mysql-db");
 
 let index = users.length;
 
@@ -59,11 +60,34 @@ const userController = {
     });
     return;
   },
-  //Get request for getting all the users in the database
-  getAllUsers: (req, res) => {
-    res.status(200).json({
-      status: 200,
-      result: users,
+  //Get request for getting all the users from the mysql database
+  getAllUsers: (req, res, next) => {
+    logger.info("Get all users");
+
+    let sqlStatement = "SELECT * FROM `user`";
+
+    pool.getConnection(function (err, conn) {
+      if (err) {
+        console.log("error", err);
+      } else if (conn) {
+        conn.query(sqlStatement, function (err, results, fields) {
+          if (err) {
+            logger.err(err.message);
+            next({
+              code: 409,
+              message: err.message,
+            });
+          }
+          if (results) {
+            logger.info("Found ", results.length, " results");
+            res.status(200).json({
+              status: 200,
+              message: "user: get all users endpoint",
+              data: results,
+            });
+          }
+        });
+      }
     });
   },
 
