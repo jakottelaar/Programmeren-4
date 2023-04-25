@@ -7,8 +7,8 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static("public"));
 app.use(express.json());
 
-const userRouter = require("./routes/user");
-app.use("/api", userRouter);
+const userRoutes = require("./src/routes/user.routes");
+app.use("/api/user", userRoutes);
 
 app.listen(port, () => {
   console.log(`Server started on port ${port}`);

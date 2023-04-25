@@ -1,5 +1,5 @@
 const express = require("express");
-const data = require("../data");
+const data = require("../util/database");
 const bodyParser = require("body-parser");
 const { assert } = require("chai");
 const router = express.Router();
