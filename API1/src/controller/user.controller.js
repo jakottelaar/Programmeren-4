@@ -4,8 +4,6 @@ const assert = require("assert");
 const users = database.users;
 const pool = require("../util/mysql-db");
 
-let index = users.length;
-
 //Function for getting a user by userId
 function getUserById(userId) {
   const user = users.find((user) => user.id === userId);
@@ -122,19 +120,31 @@ const userController = {
   //Get request for getting a user by their id
   getUserById: (req, res) => {
     const userId = parseInt(req.params.userId);
-    const user = getUserById(userId);
 
-    if (user) {
-      res.status(200).json({
-        status: 200,
-        user: user,
-      });
-    } else {
-      res.status(404).json({
-        status: 404,
-        error: "User not found",
-      });
-    }
+    let sqlStatement = "SELECT * FROM user WHERE id = ?";
+
+    pool.query(sqlStatement, userId, function (error, results, fields) {
+      if (error) {
+        console.log(error);
+        res.status(500).json({
+          status: 500,
+          message: `No user with id ${userId}`,
+          error: error,
+        });
+      } else if (results.length === 0) {
+        res.status(404).json({
+          status: 404,
+          message: `No user with ID ${userId}`,
+        });
+      } else {
+        logger.info("Retrieved user by id: ", userId);
+        res.status(200).json({
+          status: 200,
+          message: "User retrieved by id successfully.",
+          data: results,
+        });
+      }
+    });
   },
   //Put request for updating a user's profile
   updateUser: (req, res) => {
