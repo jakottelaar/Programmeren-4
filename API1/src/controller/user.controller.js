@@ -128,7 +128,7 @@ const userController = {
         console.log(error);
         res.status(500).json({
           status: 500,
-          message: `No user with id ${userId}`,
+          message: `Error retrieving user by ID`,
           error: error,
         });
       } else if (results.length === 0) {
@@ -169,21 +169,31 @@ const userController = {
   //Delete request for deleting a user by id
   deleteUser: (req, res) => {
     const userId = parseInt(req.params.userId);
-    const index = users.findIndex((user) => user.id === userId);
-    const user = getUserById(userId);
 
-    if (user) {
-      users.splice(index);
-      res.status(200).json({
-        status: 200,
-        message: `Deleted users by id ${userId}`,
-      });
-    } else {
-      res.status(404).json({
-        status: 404,
-        error: "User not found",
-      });
-    }
+    let sqlStatement = "DELETE FROM user WHERE id = ?";
+
+    pool.query(sqlStatement, userId, function (error, results, fields) {
+      if (error) {
+        console.log(error);
+        res.status(500).json({
+          status: 500,
+          message: `Error deleting user by ID`,
+          error: error,
+        });
+      } else if (results.affectedRows === 0) {
+        res.status(404).json({
+          status: 404,
+          message: `No user with ID ${userId}`,
+        });
+      } else {
+        logger.info("Deleted user by id: ", userId);
+        res.status(200).json({
+          status: 200,
+          message: "User deleted by id",
+          data: results,
+        });
+      }
+    });
   },
 };
 
