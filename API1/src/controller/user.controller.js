@@ -24,13 +24,10 @@ const userController = {
       req.body;
 
     console.log(req.body);
+
     try {
       assert(typeof firstName === "string", "firstName must be a string!");
       assert(typeof email === "string", "emailAddress must be a string!");
-      assert(
-        !users.find((user) => user.email === email),
-        "Email already exists!"
-      );
     } catch (err) {
       res.status(400).json({
         status: 400,
@@ -40,25 +37,35 @@ const userController = {
     }
 
     const newUser = {
-      id: index++,
       firstName,
       lastName,
       street,
       city,
-      isActive: true,
+      isActive: 1,
       email,
       password,
       phoneNumber,
     };
 
-    users.push(newUser);
+    let sqlStatement = "INSERT INTO user SET ?";
 
-    res.status(200).json({
-      status: 200,
-      message: "User registered successfully",
-      user: newUser,
+    pool.query(sqlStatement, newUser, function (error, results, fields) {
+      if (error) {
+        console.log(error);
+        res.status(500).json({
+          status: 500,
+          message: "Failed to create new user.",
+          error: error,
+        });
+      } else {
+        logger.info("Insert new user by id: ", results.insertId);
+        res.status(200).json({
+          status: 200,
+          message: "User created successfully.",
+          data: results,
+        });
+      }
     });
-    return;
   },
   //Get request for getting all the users from the mysql database
   getAllUsers: (req, res, next) => {
