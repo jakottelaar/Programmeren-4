@@ -149,22 +149,36 @@ const userController = {
   //Put request for updating a user's profile
   updateUser: (req, res) => {
     const userId = parseInt(req.params.userId);
-    const user = getUserById(userId);
+    const updatedUser = req.body;
 
-    if (user) {
-      const updatedUser = { ...user, ...req.body };
-      users[userId] = updatedUser;
-      res.status(200).json({
-        status: 200,
-        message: "PUT request called!",
-        user: updatedUser,
-      });
-    } else {
-      res.status(404).json({
-        status: 404,
-        error: "User not found",
-      });
-    }
+    let sqlStatement = "UPDATE user SET ? WHERE id = ?";
+
+    pool.query(
+      sqlStatement,
+      [updatedUser, userId],
+      function (error, results, fields) {
+        if (error) {
+          console.log(error);
+          res.status(500).json({
+            status: 500,
+            message: "Error updating user",
+            error: error,
+          });
+        } else if (results.affectedRows === 0) {
+          res.status(404).json({
+            status: 404,
+            message: `No user with ID ${userId}`,
+          });
+        } else {
+          logger.info(`Updated user by id: ${userId}`);
+          res.status(200).json({
+            status: 200,
+            message: "Updated user",
+            data: results,
+          });
+        }
+      }
+    );
   },
   //Delete request for deleting a user by id
   deleteUser: (req, res) => {
