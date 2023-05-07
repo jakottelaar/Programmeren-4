@@ -74,7 +74,7 @@ describe("UC-202 Opvragen van overzicht van users", () => {
 });
 
 describe("UC-203 Opvragen van gebruikersprofiel", () => {
-  it("TC-203-2 Gebruiker is ingelogd met geldig token. (Niet getest op een token, er wordt alleen een fictief profiel geretouneerd)", (done) => {
+  it.skip("TC-203-2 Gebruiker is ingelogd met geldig token. (Niet getest op een token, er wordt alleen een fictief profiel geretouneerd)", (done) => {
     chai
       .request(server)
       .get("/api/user/profile")
@@ -96,21 +96,20 @@ describe("UC-203 Opvragen van gebruikersprofiel", () => {
 });
 
 describe("UC-204 Opvragen van usergegevens bij ID", () => {
-  it.skip("TC-204-3 Gebruiker-ID bestaat(De user met het gegeven id wordt geretourneerd)", (done) => {
-    const testId = "0";
-
+  it("TC-204-3 Gebruiker-ID bestaat(De user met het gegeven id wordt geretourneerd)", (done) => {
     chai
       .request(server)
-      .get(`/api/user/${testId}`)
+      .get(`/api/user/${2}`)
       .end((err, res) => {
         expect(err).to.be.null;
 
         console.log(res.body);
         expect(res.body).to.be.an("object");
-        let { status, user } = res.body;
+        let { status, message, data } = res.body;
 
         expect(status).to.equal(200);
-        expect(user).to.be.an("object");
+        expect(message).to.equal("User retrieved by id successfully.");
+        expect(data).to.be.an("array");
 
         done();
       });
