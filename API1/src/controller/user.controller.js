@@ -201,7 +201,7 @@ const userController = {
         logger.info("Deleted user by id: ", userId);
         res.status(200).json({
           status: 200,
-          message: "User deleted by id",
+          message: `User deleted by id ${userId}`,
           data: results,
         });
       }
