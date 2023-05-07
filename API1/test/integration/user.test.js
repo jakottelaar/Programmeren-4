@@ -9,7 +9,7 @@ chai.use(chaiHttp);
 const expect = chai.expect;
 
 describe("UC-201 Registreren als een nieuwe gebruiker", () => {
-  it.skip("TC-201-5 User succesvol geregistreer", (done) => {
+  it("TC-201-5 User succesvol geregistreer", (done) => {
     const newUser = {
       firstName: "Test",
       lastName: "Testter",
@@ -46,7 +46,7 @@ describe("UC-201 Registreren als een nieuwe gebruiker", () => {
 });
 
 describe("UC-202 Opvragen van overzicht van users", () => {
-  it.skip("TC-202-1 Toon alle gebruikers (minimaal 2)", (done) => {
+  it("TC-202-1 Toon alle gebruikers (minimaal 2)", (done) => {
     chai
       .request(server)
       .get("/api/user")
@@ -74,7 +74,7 @@ describe("UC-202 Opvragen van overzicht van users", () => {
 });
 
 describe("UC-203 Opvragen van gebruikersprofiel", () => {
-  it.skip("TC-203-2 Gebruiker is ingelogd met geldig token. (Niet getest op een token, er wordt alleen een fictief profiel geretouneerd)", (done) => {
+  it("TC-203-2 Gebruiker is ingelogd met geldig token. (Niet getest op een token, er wordt alleen een fictief profiel geretouneerd)", (done) => {
     chai
       .request(server)
       .get("/api/user/profile")
@@ -117,7 +117,7 @@ describe("UC-204 Opvragen van usergegevens bij ID", () => {
 });
 
 describe("UC-206 Verwijderen van user", () => {
-  it.skip("TC-206-4 Gebruiker succesvol verwijderd", (done) => {
+  it("TC-206-4 Gebruiker succesvol verwijderd", (done) => {
     chai
       .request(server)
       .delete(`/api/user/${userId}`)
