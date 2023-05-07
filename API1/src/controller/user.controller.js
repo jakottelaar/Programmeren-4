@@ -1,7 +1,5 @@
-const database = require("../util/internal-mem-database");
 const logger = require("../util/utils").logger;
 const assert = require("assert");
-const users = database.users;
 const pool = require("../util/mysql-db");
 
 //Function for getting a user by userId
