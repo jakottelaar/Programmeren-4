@@ -2,17 +2,6 @@ const logger = require("../util/utils").logger;
 const assert = require("assert");
 const pool = require("../util/mysql-db");
 
-//Function for getting a user by userId
-function getUserById(userId) {
-  const user = users.find((user) => user.id === userId);
-
-  if (user) {
-    return user;
-  } else {
-    return null;
-  }
-}
-
 const userController = {
   //Post request for registration of a new user
   createNewUser: (req, res) => {
@@ -112,7 +101,7 @@ const userController = {
     res.status(200).json({
       status: 200,
       message: "GET Request for profile info is not yet implemented!",
-      user: users[0],
+      user: null,
     });
   },
   //Get request for getting a user by their id
