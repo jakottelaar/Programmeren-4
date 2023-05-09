@@ -1,6 +1,6 @@
 const logger = require("../util/utils").logger;
 const assert = require("assert");
-const pool = require("../util/mysql-db");
+const pool = require("../util/mysql");
 
 const userController = {
   //Post request for registration of a new user

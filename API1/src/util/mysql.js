@@ -34,3 +34,4 @@ pool.getConnection(function (err, conn) {
     pool.releaseConnection(conn);
   }
 });
+module.exports = pool;
