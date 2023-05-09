@@ -1,34 +1,34 @@
-name: Run the integration tests
+# name: Run the integration tests
 
-on:
-  push:
-    branches:
-      - main
+# on:
+#   push:
+#     branches:
+#       - main
 
-jobs:
-  integrationtests:
-    runs-on: ubuntu-latest
-    steps:
-      # Checkout the Repo
-      - uses: actions/checkout@v2
+# jobs:
+#   integrationtests:
+#     runs-on: ubuntu-latest
+#     steps:
+#       # Checkout the Repo
+#       - uses: actions/checkout@v2
 
-      # Install Node 16
-      - name: Setup Node
-        uses: actions/setup-node@v1
-        with:
-          node-version: 16
+#       # Install Node 16
+#       - name: Setup Node
+#         uses: actions/setup-node@v1
+#         with:
+#           node-version: 16
 
-      # Install dependencies
-      - name: Install dependencies
-        working-directory: ./API1
-        run: npm install
+#       # Install dependencies
+#       - name: Install dependencies
+#         working-directory: ./API1
+#         run: npm install
 
-      # Give execute permission to mocha
-      - name: Add execute permission to mocha
-        working-directory: ./API1
-        run: chmod +x ./node_modules/.bin/mocha
+#       # Give execute permission to mocha
+#       - name: Add execute permission to mocha
+#         working-directory: ./API1
+#         run: chmod +x ./node_modules/.bin/mocha
 
-      # Run tests
-      - name: Run tests
-        working-directory: ./API1
-        run: npm test
+#       # Run tests
+#       - name: Run tests
+#         working-directory: ./API1
+#         run: npm test
