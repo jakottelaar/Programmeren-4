@@ -1,21 +1,6 @@
-const database = require("../util/internal-mem-database");
 const logger = require("../util/utils").logger;
 const assert = require("assert");
-const users = database.users;
-const pool = require("../util/mysql-db");
-
-let index = users.length;
-
-//Function for getting a user by userId
-function getUserById(userId) {
-  const user = users.find((user) => user.id === userId);
-
-  if (user) {
-    return user;
-  } else {
-    return null;
-  }
-}
+const pool = require("../util/mysql");
 
 const userController = {
   //Post request for registration of a new user
@@ -24,13 +9,10 @@ const userController = {
       req.body;
 
     console.log(req.body);
+
     try {
       assert(typeof firstName === "string", "firstName must be a string!");
       assert(typeof email === "string", "emailAddress must be a string!");
-      assert(
-        !users.find((user) => user.email === email),
-        "Email already exists!"
-      );
     } catch (err) {
       res.status(400).json({
         status: 400,
@@ -40,25 +22,35 @@ const userController = {
     }
 
     const newUser = {
-      id: index++,
       firstName,
       lastName,
       street,
       city,
-      isActive: true,
+      isActive: 1,
       email,
       password,
       phoneNumber,
     };
 
-    users.push(newUser);
+    let sqlStatement = "INSERT INTO user SET ?";
 
-    res.status(200).json({
-      status: 200,
-      message: "User registered successfully",
-      user: newUser,
+    pool.query(sqlStatement, newUser, function (error, results, fields) {
+      if (error) {
+        console.log(error);
+        res.status(500).json({
+          status: 500,
+          message: "Failed to create new user.",
+          error: error,
+        });
+      } else {
+        logger.info("Insert new user by id: ", results.insertId);
+        res.status(200).json({
+          status: 200,
+          message: "User created successfully.",
+          data: results,
+        });
+      }
     });
-    return;
   },
   //Get request for getting all the users from the mysql database
   getAllUsers: (req, res, next) => {
@@ -109,64 +101,100 @@ const userController = {
     res.status(200).json({
       status: 200,
       message: "GET Request for profile info is not yet implemented!",
-      user: users[0],
+      user: null,
     });
   },
   //Get request for getting a user by their id
   getUserById: (req, res) => {
     const userId = parseInt(req.params.userId);
-    const user = getUserById(userId);
 
-    if (user) {
-      res.status(200).json({
-        status: 200,
-        user: user,
-      });
-    } else {
-      res.status(404).json({
-        status: 404,
-        error: "User not found",
-      });
-    }
+    let sqlStatement = "SELECT * FROM user WHERE id = ?";
+
+    pool.query(sqlStatement, userId, function (error, results, fields) {
+      if (error) {
+        console.log(error);
+        res.status(500).json({
+          status: 500,
+          message: `Error retrieving user by ID`,
+          error: error,
+        });
+      } else if (results.length === 0) {
+        res.status(404).json({
+          status: 404,
+          message: `No user with ID ${userId}`,
+        });
+      } else {
+        logger.info("Retrieved user by id: ", userId);
+        res.status(200).json({
+          status: 200,
+          message: "User retrieved by id successfully.",
+          data: results,
+        });
+      }
+    });
   },
   //Put request for updating a user's profile
   updateUser: (req, res) => {
     const userId = parseInt(req.params.userId);
-    const user = getUserById(userId);
+    const updatedUser = req.body;
 
-    if (user) {
-      const updatedUser = { ...user, ...req.body };
-      users[userId] = updatedUser;
-      res.status(200).json({
-        status: 200,
-        message: "PUT request called!",
-        user: updatedUser,
-      });
-    } else {
-      res.status(404).json({
-        status: 404,
-        error: "User not found",
-      });
-    }
+    let sqlStatement = "UPDATE user SET ? WHERE id = ?";
+
+    pool.query(
+      sqlStatement,
+      [updatedUser, userId],
+      function (error, results, fields) {
+        if (error) {
+          console.log(error);
+          res.status(500).json({
+            status: 500,
+            message: "Error updating user",
+            error: error,
+          });
+        } else if (results.affectedRows === 0) {
+          res.status(404).json({
+            status: 404,
+            message: `No user with ID ${userId}`,
+          });
+        } else {
+          logger.info(`Updated user by id: ${userId}`);
+          res.status(200).json({
+            status: 200,
+            message: "Updated user",
+            data: results,
+          });
+        }
+      }
+    );
   },
   //Delete request for deleting a user by id
   deleteUser: (req, res) => {
     const userId = parseInt(req.params.userId);
-    const index = users.findIndex((user) => user.id === userId);
-    const user = getUserById(userId);
 
-    if (user) {
-      users.splice(index);
-      res.status(200).json({
-        status: 200,
-        message: `Deleted users by id ${userId}`,
-      });
-    } else {
-      res.status(404).json({
-        status: 404,
-        error: "User not found",
-      });
-    }
+    let sqlStatement = "DELETE FROM user WHERE id = ?";
+
+    pool.query(sqlStatement, userId, function (error, results, fields) {
+      if (error) {
+        console.log(error);
+        res.status(500).json({
+          status: 500,
+          message: `Error deleting user by ID`,
+          error: error,
+        });
+      } else if (results.affectedRows === 0) {
+        res.status(404).json({
+          status: 404,
+          message: `No user with ID ${userId}`,
+        });
+      } else {
+        logger.info("Deleted user by id: ", userId);
+        res.status(200).json({
+          status: 200,
+          message: `User deleted by id ${userId}`,
+          data: results,
+        });
+      }
+    });
   },
 };
 
