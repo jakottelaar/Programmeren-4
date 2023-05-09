@@ -9,12 +9,12 @@ jobs:
   integrationtests:
     runs-on: ubuntu-latest
     env:
-      MYSQL_ROOT_PASSWORD: secret # default root password to use must be 'root'
+      MYSQL_ROOT_PASSWORD: "secret" # default root password to use must be 'root'
       DB_HOST: "db-mysql-ams3-46626-do-user-8155278-0.b.db.ondigitalocean.com"
       DB_PORT: "25060"
       DB_DATABASE: 2176550
       DB_USER: 2176550
-      DB_PASSWORD: secret
+      DB_PASSWORD: "secret"
     services:
       mysql:
         image: mysql:5.7
