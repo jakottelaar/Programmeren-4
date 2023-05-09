@@ -6,69 +6,51 @@ on:
       - main
 
 jobs:
-  integrationtests:
+  build:
     runs-on: ubuntu-latest
     env:
-      MYSQL_ROOT_PASSWORD: "secret" # default root password to use must be 'root'
-      DB_HOST: "db-mysql-ams3-46626-do-user-8155278-0.b.db.ondigitalocean.com"
-      DB_PORT: "25060"
-      DB_DATABASE: 2176550
-      DB_USER: 2176550
-      DB_PASSWORD: "secret"
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_HOST: 127.0.0.1
+      MYSQL_PORT: 3306
+      MYSQL_DATABASE: shareameal
+      MYSQL_USER: root
+      MYSQL_PASSWORD: root
     services:
       mysql:
         image: mysql:5.7
         ports:
-          - "25060"
+          - 3306
     steps:
-      - uses: actions/checkout@main
-
+      - uses: actions/checkout@v3
+      - name: Use Node.js 18
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
       - name: Start MySQL connection from host
         run: |
           sudo /etc/init.d/mysql start
           sudo apt-get install -y mysql-client
           mysql -uroot -p${{ env.MYSQL_ROOT_PASSWORD }} -e "SHOW DATABASES;"
-          mysql -uroot -p${{ env.MYSQL_ROOT_PASSWORD }} -e "CREATE DATABASE ${{env.DB_DATABASE}};"
-
+          mysql -uroot -p${{ env.MYSQL_ROOT_PASSWORD }} -e "CREATE DATABASE ${{env.MYSQL_DATABASE}};"
       - name: Import database script
         run: |
-          mysql -uroot -p${{env.MYSQL_ROOT_PASSWORD}} ${{env.DB_DATABASE}} < share-a-meal.sql
-          mysql -uroot -p${{env.MYSQL_ROOT_PASSWORD}} ${{env.DB_DATABASE}} -e "SHOW TABLES;"
-
-      - name: npm install
-        run: |
-          npm install
-
-      - name: npm test
-        run: |
-          npm test -- --DB_PASSWORD {{env.MYSQL_ROOT_PASSWORD}} --DB_USER root --DB_NAME ${{env.DB_DATABASE}}
-
-  #   Heroku-deploy:
-  #     needs: integrationtests
-  #     runs-on: ubuntu-latest
-  #     environment:
-  #       name: Heroku # naam van mijn environment op GitHub
-  #     steps:
-  #       - uses: actions/checkout@main
-  #       - uses: akhileshns/heroku-deploy@v3.12.12
-  #         with:
-  #           heroku_api_key: ${{secrets.HEROKU_API_KEY}}
-  #           heroku_app_name: shareameal-prog4
-  #           heroku_email: ${{secrets.HEROKU_USER_EMAIL}}
+          mysql -uroot -p${{env.MYSQL_ROOT_PASSWORD}} ${{env.MYSQL_DATABASE}} < share-a-meal.sql
+          mysql -uroot -p${{env.MYSQL_ROOT_PASSWORD}} ${{env.MYSQL_DATABASE}} -e "SHOW TABLES;"
+          mysql -uroot -p${{env.MYSQL_ROOT_PASSWORD}} ${{env.MYSQL_DATABASE}} -e "SHOW VARIABLES;"
+      - run: npm ci
+      - run: npm test
 
   Railway-deploy:
-    needs: integrationtests
     runs-on: ubuntu-latest
     environment:
-      name: Railway # naam van mijn environment op GitHub
+      name: Railway
     steps:
       - name: Clone repository
-        uses: actions/checkout@main
+        uses: actions/checkout@v3
 
       - name: "Current token"
         run: |
           echo "secrets.RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}"
-
       - name: Install Railway
         run: npm i -g @railway/cli
 
