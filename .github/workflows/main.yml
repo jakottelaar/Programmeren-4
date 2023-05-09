@@ -22,23 +22,34 @@ jobs:
           - 3306
     steps:
       - uses: actions/checkout@v3
+
       - name: Use Node.js 18
         uses: actions/setup-node@v3
         with:
           node-version: 18
+
       - name: Start MySQL connection from host
         run: |
           sudo /etc/init.d/mysql start
           sudo apt-get install -y mysql-client
           mysql -uroot -p${{ env.MYSQL_ROOT_PASSWORD }} -e "SHOW DATABASES;"
           mysql -uroot -p${{ env.MYSQL_ROOT_PASSWORD }} -e "CREATE DATABASE ${{env.MYSQL_DATABASE}};"
+
       - name: Import database script
         run: |
-          mysql -uroot -p${{env.MYSQL_ROOT_PASSWORD}} ${{env.MYSQL_DATABASE}} < share-a-meal.sql
+          mysql -uroot -p${{env.MYSQL_ROOT_PASSWORD}} ${{env.MYSQL_DATABASE}} < API1/share-a-meal.sql
           mysql -uroot -p${{env.MYSQL_ROOT_PASSWORD}} ${{env.MYSQL_DATABASE}} -e "SHOW TABLES;"
           mysql -uroot -p${{env.MYSQL_ROOT_PASSWORD}} ${{env.MYSQL_DATABASE}} -e "SHOW VARIABLES;"
-      - run: npm ci
-      - run: npm test
+
+      - name: npm install
+        run: |
+          cd API1
+          npm install
+
+      - name: npm test
+        run: |
+          cd API1
+          npm test
 
   Railway-deploy:
     runs-on: ubuntu-latest
@@ -51,6 +62,7 @@ jobs:
       - name: "Current token"
         run: |
           echo "secrets.RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}"
+
       - name: Install Railway
         run: npm i -g @railway/cli
 
