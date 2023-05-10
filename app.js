@@ -1,14 +1,39 @@
 const express = require("express");
 const bodyParser = require("body-parser");
+const logger = require("../Programmeren-4/src/util/utils").logger;
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static("public"));
 app.use(express.json());
 
+app.use("*", (req, res, next) => {
+  const method = req.method;
+  logger.trace(`Methode ${method} is aangeroepen`);
+  next();
+});
+
 const userRoutes = require("./src/routes/user.routes");
 app.use("/api/user", userRoutes);
+
+app.use("*", (req, res) => {
+  logger.warn("Invalid endpoint called: ", req.path);
+  res.status(404).json({
+    status: 404,
+    message: "Endpoint not found",
+    data: {},
+  });
+});
+
+app.use((err, req, res, next) => {
+  logger.error(err.code, err.message);
+  res.status(err.code).json({
+    statusCode: err.code,
+    message: err.message,
+    data: {},
+  });
+});
 
 app.listen(port, () => {
   console.log(`Server started on port ${port}`);
