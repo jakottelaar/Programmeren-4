@@ -1,4 +1,4 @@
-name: Run tests before deploying code
+name: Testing and deployment
 
 on:
   push:
