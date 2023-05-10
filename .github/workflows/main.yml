@@ -10,6 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       MYSQL_ROOT_PASSWORD: secret
+      MYSQL_DATABASE: 2176550
       DB_HOST: db-mysql-ams3-46626-do-user-8155278-0.b.db.ondigitalocean.com
       DB_USER: 2176550
       DB_PASSWORD: secret
@@ -19,24 +20,28 @@ jobs:
       mysql:
         image: mysql:5.7
         ports:
-          - 25060
+          - 25060:3306
     steps:
       - uses: actions/checkout@v3
+
       - name: Use Node.js 18
         uses: actions/setup-node@v3
         with:
           node-version: 18
+
       - name: Start MySQL connection from host
         run: |
-          sudo /etc/init.d/mysql start
+          sudo service mysql start
           sudo apt-get install -y mysql-client
-          mysql -u${{ env.DB_USER }} -p${{ env.MYSQL_ROOT_PASSWORD }} -e "SHOW DATABASES;"
-          mysql -u${{ env.DB_USER }}  -p${{ env.MYSQL_ROOT_PASSWORD }} -e "CREATE DATABASE ${{env.MYSQL_DATABASE}};"
+          mysql -h ${{ env.DB_HOST }} -P ${{ env.DB_PORT }} -u ${{ env.DB_USER }} -p${{ env.MYSQL_ROOT_PASSWORD }} -e "SHOW DATABASES;"
+          mysql -h ${{ env.DB_HOST }} -P ${{ env.DB_PORT }} -u ${{ env.DB_USER }} -p${{ env.MYSQL_ROOT_PASSWORD }} -e "CREATE DATABASE ${{ env.MYSQL_DATABASE }};"
+
       - name: Import database script
         run: |
-          mysql -uroot -p${{env.MYSQL_ROOT_PASSWORD}} ${{env.MYSQL_DATABASE}} < share-a-meal.sql
-          mysql -uroot -p${{env.MYSQL_ROOT_PASSWORD}} ${{env.MYSQL_DATABASE}} -e "SHOW TABLES;"
-          mysql -uroot -p${{env.MYSQL_ROOT_PASSWORD}} ${{env.MYSQL_DATABASE}} -e "SHOW VARIABLES;"
+          mysql -h ${{ env.DB_HOST }} -P ${{ env.DB_PORT }} -u root -p${{ env.MYSQL_ROOT_PASSWORD }} ${{ env.MYSQL_DATABASE }} < share-a-meal.sql
+          mysql -h ${{ env.DB_HOST }} -P ${{ env.DB_PORT }} -u root -p${{ env.MYSQL_ROOT_PASSWORD }} ${{ env.MYSQL_DATABASE }} -e "SHOW TABLES;"
+          mysql -h ${{ env.DB_HOST }} -P ${{ env.DB_PORT }} -u root -p${{ env.MYSQL_ROOT_PASSWORD }} ${{ env.MYSQL_DATABASE }} -e "SHOW VARIABLES;"
+
       - run: npm ci
       - run: npm test
 
@@ -51,6 +56,7 @@ jobs:
       - name: "Current token"
         run: |
           echo "secrets.RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}"
+
       - name: Install Railway
         run: npm i -g @railway/cli
 
