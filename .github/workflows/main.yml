@@ -9,27 +9,34 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      MYSQL_ROOT_PASSWORD: secret
-      DB_HOST: db-mysql-ams3-46626-do-user-8155278-0.b.db.ondigitalocean.com
-      DB_PORT: 25060
-      DB_USER: 2176550
-      DB_PASSWORD: secret
-      DB_NAME: shareameal
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_HOST: 127.0.0.1
+      MYSQL_PORT: 3306
+      MYSQL_DATABASE: share-a-meal-db
+      MYSQL_USER: root
+      MYSQL_PASSWORD: root
+    services:
+      mysql:
+        image: mysql:5.7
+        ports:
+          - 3306
     steps:
       - uses: actions/checkout@v3
       - name: Use Node.js 18
         uses: actions/setup-node@v3
         with:
           node-version: 18
-      - name: Install MySQL client
-        run: sudo apt-get install -y mysql-client
+      - name: Start MySQL connection from host
+        run: |
+          sudo /etc/init.d/mysql start
+          sudo apt-get install -y mysql-client
+          mysql -uroot -p${{ env.MYSQL_ROOT_PASSWORD }} -e "SHOW DATABASES;"
+          mysql -uroot -p${{ env.MYSQL_ROOT_PASSWORD }} -e "CREATE DATABASE ${{env.MYSQL_DATABASE}};"
       - name: Import database script
         run: |
-          mysql -h $DB_HOST -P $DB_PORT -u $DB_USER -p$MYSQL_ROOT_PASSWORD -e "SHOW DATABASES;"
-          mysql -h $DB_HOST -P $DB_PORT -u $DB_USER -p$MYSQL_ROOT_PASSWORD -e "CREATE DATABASE IF NOT EXISTS \`$DB_NAME\`;"
-          mysql -h $DB_HOST -P $DB_PORT -u $DB_USER -p$MYSQL_ROOT_PASSWORD $DB_NAME < share-a-meal.sql
-          mysql -h $DB_HOST -P $DB_PORT -u $DB_USER -p$MYSQL_ROOT_PASSWORD -e "SHOW TABLES;"
-          mysql -h $DB_HOST -P $DB_PORT -u $DB_USER -p$MYSQL_ROOT_PASSWORD -e "SHOW VARIABLES;"
+          mysql -uroot -p${{env.MYSQL_ROOT_PASSWORD}} ${{env.MYSQL_DATABASE}} < share-a-meal.sql
+          mysql -uroot -p${{env.MYSQL_ROOT_PASSWORD}} ${{env.MYSQL_DATABASE}} -e "SHOW TABLES;"
+          mysql -uroot -p${{env.MYSQL_ROOT_PASSWORD}} ${{env.MYSQL_DATABASE}} -e "SHOW VARIABLES;"
       - run: npm ci
       - run: npm test
 
