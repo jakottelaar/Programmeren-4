@@ -9,17 +9,12 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      MYSQL_ROOT_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: secret
       DB_HOST: db-mysql-ams3-46626-do-user-8155278-0.b.db.ondigitalocean.com
       DB_USER: 2176550
       DB_PASSWORD: secret
       DB_NAME: 2176550
       DB_PORT: 25060
-      waitForConnections: true
-      connectionLimit: 10
-      maxIdle: 10
-      idleTimeout: 60000
-      queueLimit: 0
     services:
       mysql:
         image: mysql:5.7
@@ -35,8 +30,8 @@ jobs:
         run: |
           sudo /etc/init.d/mysql start
           sudo apt-get install -y mysql-client
-          mysql -uroot -p${{ env.MYSQL_ROOT_PASSWORD }} -e "SHOW DATABASES;"
-          mysql -uroot -p${{ env.MYSQL_ROOT_PASSWORD }} -e "CREATE DATABASE ${{env.MYSQL_DATABASE}};"
+          mysql -u${{ env.DB_USER }} -p${{ env.MYSQL_ROOT_PASSWORD }} -e "SHOW DATABASES;"
+          mysql -u${{ env.DB_USER }}  -p${{ env.MYSQL_ROOT_PASSWORD }} -e "CREATE DATABASE ${{env.MYSQL_DATABASE}};"
       - name: Import database script
         run: |
           mysql -uroot -p${{env.MYSQL_ROOT_PASSWORD}} ${{env.MYSQL_DATABASE}} < share-a-meal.sql
