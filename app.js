@@ -1,6 +1,6 @@
 const express = require("express");
 const bodyParser = require("body-parser");
-const logger = require("../Programmeren-4/src/util/utils").logger;
+const logger = require("./src/util/utils").logger;
 const app = express();
 const port = process.env.PORT || 3000;
 
