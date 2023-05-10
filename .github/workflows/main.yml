@@ -14,7 +14,7 @@ jobs:
       DB_HOST: db-mysql-ams3-46626-do-user-8155278-0.b.db.ondigitalocean.com
       DB_USER: 2176550
       DB_PASSWORD: secret
-      DB_NAME: 2176550
+      DB_NAME: shareameal
       DB_PORT: 25060
     services:
       mysql:
