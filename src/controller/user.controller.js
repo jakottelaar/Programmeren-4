@@ -121,14 +121,19 @@ const userController = {
     let values = []; // Initialize values as an empty array
 
     if (Object.keys(filters).length > 0) {
+      const validFields = ["firstName", "lastName", "emailAddress", "isActive"];
       const conditions = [];
 
       for (const key in filters) {
-        conditions.push(`${key} = ?`);
-        values.push(filters[key]);
+        if (validFields.includes(key)) {
+          conditions.push(`${key} = ?`);
+          values.push(filters[key]);
+        }
       }
 
-      sqlStatement += " WHERE " + conditions.join(" AND ");
+      if (conditions.length > 0) {
+        sqlStatement += " WHERE " + conditions.join(" AND ");
+      }
     }
 
     pool.query(sqlStatement, values, function (error, results, fields) {
@@ -148,6 +153,7 @@ const userController = {
       }
     });
   },
+
   //Get request for getting a users profile (not yet implemented)
   getUserProfile: (req, res) => {
     res.status(200).json({
