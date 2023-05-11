@@ -284,7 +284,7 @@ describe("UC-205 Gebruiker wijzingen", () => {
 
 describe("UC-206 Verwijderen van user", () => {
   it("TC-206-1 Gebruiker bestaat niet", (done) => {
-    const nonExistentUserId = 89 + 1;
+    const nonExistentUserId = userId + 1;
 
     chai
       .request(server)
