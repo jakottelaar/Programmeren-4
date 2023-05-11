@@ -1,45 +1,72 @@
 const logger = require("../util/utils").logger;
 const assert = require("assert");
 const pool = require("../util/mysql");
+const Joi = require("joi");
 
 const userController = {
   //Post request for registration of a new user
   createNewUser: (req, res) => {
-    const {
-      firstName,
-      lastName,
-      street,
-      city,
-      emailAddress,
-      password,
-      phoneNumber,
-    } = req.body;
+    const input = req.body;
 
-    console.log(req.body);
+    const schema = Joi.object({
+      firstName: Joi.string().required(),
+      lastName: Joi.string().min(2).required(),
+      street: Joi.string().allow("").required(),
+      city: Joi.string().allow("").required(),
+      emailAddress: Joi.string()
+        .pattern(
+          new RegExp(/^[a-zA-Z]\.[a-zA-Z]{2,}@([a-zA-Z]{2,}\.[a-zA-Z]{2,3})$/)
+        )
+        .required()
+        .messages({
+          "string.empty": `Email address cannot be empty`,
+          "any.required": `Email address is required`,
+          "string.pattern.base": `Email address is not valid conform to the format: f.lastname@mail.com`,
+        }),
+      password: Joi.string()
+        .min(8)
+        .regex(/^(?=.*[A-Z])(?=.*\d)/)
+        .required()
+        .messages({
+          "string.empty": "Password cannot be empty",
+          "any.required": "Password is required",
+          "string.pattern.base":
+            "Password is not valid. It should contain at least 8 characters, including at least one uppercase letter and one digit.",
+        }),
+      phoneNumber: Joi.string()
+        .length(10)
+        .pattern(/^06[-\s]?\d{8}$/)
+        .required()
+        .messages({
+          "string.empty": "Phone number cannot be empty",
+          "any.required": "Phone number is required",
+          "string.pattern.base":
+            "Phone number is not valid. It should start with '06' and be followed by 8 digits.",
+          "string.length": "Phone number should be 10 digits long.",
+        }),
+    });
 
-    try {
-      assert(typeof firstName === "string", "firstName must be a string!");
-      assert(
-        typeof emailAddress === "string",
-        "emailAddress must be a string!"
-      );
-      assert(Object.values(req.body).every((field) => field !== null));
-    } catch (err) {
+    const { error, value } = schema.validate(input);
+
+    if (error) {
+      console.log(error.details);
       res.status(400).json({
         status: 400,
-        message: err.message.toString(),
+        message: error.message,
       });
       return;
     }
 
+    console.log(req.body);
+
     const newUser = {
-      firstName,
-      lastName,
-      street,
-      city,
-      emailAddress,
-      password,
-      phoneNumber,
+      firstName: input.firstName,
+      lastName: input.lastName,
+      street: input.street,
+      city: input.city,
+      emailAddress: input.emailAddress,
+      password: input.password,
+      phoneNumber: input.phoneNumber,
     };
 
     let sqlStatement = "INSERT INTO user SET ?";
