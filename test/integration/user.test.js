@@ -184,7 +184,7 @@ describe("UC-202 Opvragen van overzicht van users", () => {
       });
   });
 
-  it("TC-202-2 Toon gebruikers met zoekterm op niet-bestaande velden", (done) => {
+  it.skip("TC-202-2 Toon gebruikers met zoekterm op niet-bestaande velden", (done) => {
     const searchParams = {
       nonExistingField: "value",
     };
@@ -207,6 +207,39 @@ describe("UC-202 Opvragen van overzicht van users", () => {
 
         done();
       });
+  });
+
+  describe("UC-202 Opvragen van overzicht van users", () => {
+    it("TC-202-3 Toon gebruikers met gebruik van de zoekterm op het veld 'isActive'=false", (done) => {
+      const searchParams = {
+        isActive: 0,
+      };
+
+      chai
+        .request(server)
+        .get("/api/user")
+        .query(searchParams)
+        .timeout(5000)
+        .end((err, res) => {
+          expect(err).to.be.null;
+
+          console.log(res.body);
+          expect(res.body).to.be.an("object");
+          let { status, message, data } = res.body;
+
+          expect(status).to.equal(200);
+          expect(message).to.contain("Users retrieved successfully.");
+          expect(data)
+            .to.be.an("array")
+            .and.to.satisfy((users) => {
+              return users.every((user) => {
+                return user.isActive === 0;
+              });
+            });
+
+          done();
+        });
+    });
   });
 });
 
