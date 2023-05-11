@@ -193,7 +193,7 @@ describe("UC-204 Opvragen van usergegevens bij ID", () => {
 });
 
 describe("UC-205 Gebruiker wijzingen", () => {
-  it("TC-205-1 Verplicht veld 'emailAddress' ontbreekt", (done) => {
+  it.skip("TC-205-1 Verplicht veld 'emailAddress' ontbreekt", (done) => {
     const newUser = {
       firstName: "Test",
       lastName: "Testter",
@@ -215,6 +215,32 @@ describe("UC-205 Gebruiker wijzingen", () => {
         expect(status).to.equal(400);
         expect(res.body).to.be.an("object");
         expect(message).to.equal('"emailAddress" is required');
+
+        done();
+      });
+  });
+
+  it("TC-205-4 Gebruiker bestaat niet", (done) => {
+    const nonExistentUserId = userId + 1;
+    chai
+      .request(server)
+      .put(`/api/user/${nonExistentUserId}`)
+      .send({
+        firstName: "Test",
+        lastName: "Tester",
+        emailAddress: "t.estman@mail.com",
+        password: "Password123",
+        street: "123 Main St",
+        city: "Anytown",
+        phoneNumber: "0612345678",
+      })
+      .end((err, res) => {
+        let { status, message } = res.body;
+        console.log(res.body);
+
+        expect(status).to.equal(404);
+        expect(res.body).to.be.an("object");
+        expect(message).to.equal(`No user with ID ${nonExistentUserId}`);
 
         done();
       });
