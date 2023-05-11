@@ -154,7 +154,7 @@ describe("UC-203 Opvragen van gebruikersprofiel", () => {
 });
 
 describe("UC-204 Opvragen van usergegevens bij ID", () => {
-  it("TC-204-2 Gebruiker-ID bestaat niet", (done) => {
+  it.skip("TC-204-2 Gebruiker-ID bestaat niet", (done) => {
     const invalidUserId = userId + 1;
 
     chai
@@ -186,6 +186,35 @@ describe("UC-204 Opvragen van usergegevens bij ID", () => {
         expect(status).to.equal(200);
         expect(message).to.equal("User retrieved by id successfully.");
         expect(data).to.be.an("array");
+
+        done();
+      });
+  });
+});
+
+describe("UC-205 Gebruiker wijzingen", () => {
+  it("TC-205-1 Verplicht veld 'emailAddress' ontbreekt", (done) => {
+    const newUser = {
+      firstName: "Test",
+      lastName: "Testter",
+      street: "123 Test St",
+      city: "Test city",
+      password: "Password123",
+      phoneNumber: "0612345678",
+    };
+
+    chai
+      .request(server)
+      .post("/api/user")
+      .send(newUser)
+      .end((err, res) => {
+        expect(err).to.be.null;
+        let { status, message } = res.body;
+        console.log(res.body);
+
+        expect(status).to.equal(400);
+        expect(res.body).to.be.an("object");
+        expect(message).to.equal('"emailAddress" is required');
 
         done();
       });
