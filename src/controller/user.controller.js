@@ -115,48 +115,38 @@ const userController = {
     });
   },
   //Get request for getting all the users from the mysql database
-  getAllUsers: (req, res, next) => {
-    logger.info("Get all users");
-
+  getAllUsers: (req, res) => {
+    const filters = req.query;
     let sqlStatement = "SELECT * FROM `user`";
+    let values = []; // Initialize values as an empty array
 
-    pool.getConnection(function (err, conn) {
-      if (err) {
-        console.log("error", err);
-      } else if (conn) {
-        conn.query(sqlStatement, function (err, results, fields) {
-          if (err) {
-            logger.err(err.message);
-            next({
-              code: 409,
-              message: err.message,
-            });
-          }
-          if (results) {
-            logger.info("Found ", results.length, " results");
-            res.status(200).json({
-              status: 200,
-              message: "user: get all users endpoint",
-              data: results,
-            });
-          }
+    if (Object.keys(filters).length > 0) {
+      const conditions = [];
+
+      for (const key in filters) {
+        conditions.push(`${key} = ?`);
+        values.push(filters[key]);
+      }
+
+      sqlStatement += " WHERE " + conditions.join(" AND ");
+    }
+
+    pool.query(sqlStatement, values, function (error, results, fields) {
+      if (error) {
+        console.log(error);
+        res.status(500).json({
+          status: 500,
+          message: "Failed to retrieve users.",
+          error: error,
+        });
+      } else {
+        res.status(200).json({
+          status: 200,
+          message: "Users retrieved successfully.",
+          data: results,
         });
       }
     });
-  },
-
-  //Get request for getting users filtered on criteria
-  getFiltersUsers: (req, res) => {
-    const filters = req.query;
-    const filteredUsers = users.filter((user) => {
-      let isValid = true;
-      for (key in filters) {
-        console.log(key, users[key], filters[key]);
-        isValid = isValid && user[key] == filters[key];
-      }
-      return isValid;
-    });
-    res.json(filteredUsers);
   },
   //Get request for getting a users profile (not yet implemented)
   getUserProfile: (req, res) => {
