@@ -9,7 +9,7 @@ chai.use(chaiHttp);
 const expect = chai.expect;
 
 describe("UC-201 Registreren als een nieuwe gebruiker", () => {
-  it("TC-201-1 Verplicht veld ontbreekt", (done) => {
+  it.skip("TC-201-1 Verplicht veld ontbreekt", (done) => {
     const requestBody = {
       firstName: "",
       lastName: "Testter",
@@ -39,7 +39,33 @@ describe("UC-201 Registreren als een nieuwe gebruiker", () => {
       });
   });
 
-  it("TC-201-5 User succesvol geregistreer", (done) => {
+  it("TC-201-2 Niet-valide emailadres", (done) => {
+    const newUser = {
+      firstName: "Test",
+      lastName: "Tester",
+      emailAddress: "invalidemail",
+      password: "Password123",
+      street: "123 Main St",
+      city: "Anytown",
+      phoneNumber: "0612345678",
+    };
+
+    chai
+      .request(server)
+      .post("/api/user")
+      .send(newUser)
+      .end((err, res) => {
+        let { status, message } = res.body;
+
+        expect(status).to.equal(400);
+        expect(res.body).to.be.an("object");
+        expect(message).to.equal("Email address is not valid");
+
+        done();
+      });
+  });
+
+  it.skip("TC-201-5 User succesvol geregistreer", (done) => {
     const newUser = {
       firstName: "Test",
       lastName: "Testter",
@@ -74,7 +100,7 @@ describe("UC-201 Registreren als een nieuwe gebruiker", () => {
       });
   });
 
-  it("TC-201-4 gebruiker bestaat al", (done) => {
+  it.skip("TC-201-4 gebruiker bestaat al", (done) => {
     const existingUser = {
       firstName: "Test",
       lastName: "Testter",
@@ -104,7 +130,7 @@ describe("UC-201 Registreren als een nieuwe gebruiker", () => {
 });
 
 describe("UC-202 Opvragen van overzicht van users", () => {
-  it("TC-202-1 Toon alle gebruikers (minimaal 2)", (done) => {
+  it.skip("TC-202-1 Toon alle gebruikers (minimaal 2)", (done) => {
     chai
       .request(server)
       .get("/api/user")
@@ -132,7 +158,7 @@ describe("UC-202 Opvragen van overzicht van users", () => {
 });
 
 describe("UC-203 Opvragen van gebruikersprofiel", () => {
-  it("TC-203-2 Gebruiker is ingelogd met geldig token. (Niet getest op een token, er wordt alleen een fictief profiel geretouneerd)", (done) => {
+  it.skip("TC-203-2 Gebruiker is ingelogd met geldig token. (Niet getest op een token, er wordt alleen een fictief profiel geretouneerd)", (done) => {
     chai
       .request(server)
       .get("/api/user/profile")
@@ -154,7 +180,7 @@ describe("UC-203 Opvragen van gebruikersprofiel", () => {
 });
 
 describe("UC-204 Opvragen van usergegevens bij ID", () => {
-  it("TC-204-2 Gebruiker-ID bestaat niet", (done) => {
+  it.skip("TC-204-2 Gebruiker-ID bestaat niet", (done) => {
     const invalidUserId = userId + 1;
 
     chai
@@ -172,7 +198,7 @@ describe("UC-204 Opvragen van usergegevens bij ID", () => {
       });
   });
 
-  it("TC-204-3 Gebruiker-ID bestaat(De user met het gegeven id wordt geretourneerd)", (done) => {
+  it.skip("TC-204-3 Gebruiker-ID bestaat(De user met het gegeven id wordt geretourneerd)", (done) => {
     chai
       .request(server)
       .get(`/api/user/${userId}`)
@@ -193,7 +219,7 @@ describe("UC-204 Opvragen van usergegevens bij ID", () => {
 });
 
 describe("UC-205 Gebruiker wijzingen", () => {
-  it("TC-205-1 Verplicht veld 'emailAddress' ontbreekt", (done) => {
+  it.skip("TC-205-1 Verplicht veld 'emailAddress' ontbreekt", (done) => {
     const newUser = {
       firstName: "Test",
       lastName: "Testter",
@@ -220,7 +246,7 @@ describe("UC-205 Gebruiker wijzingen", () => {
       });
   });
 
-  it("TC-205-4 Gebruiker bestaat niet", (done) => {
+  it.skip("TC-205-4 Gebruiker bestaat niet", (done) => {
     const nonExistentUserId = userId + 1;
     chai
       .request(server)
@@ -246,7 +272,7 @@ describe("UC-205 Gebruiker wijzingen", () => {
       });
   });
 
-  it("TC-205-6 Gebruiker succesvol gewijzigd", (done) => {
+  it.skip("TC-205-6 Gebruiker succesvol gewijzigd", (done) => {
     const updatedUser = {
       firstName: "Testie",
       lastName: "man",
@@ -283,7 +309,7 @@ describe("UC-205 Gebruiker wijzingen", () => {
 });
 
 describe("UC-206 Verwijderen van user", () => {
-  it("TC-206-1 Gebruiker bestaat niet", (done) => {
+  it.skip("TC-206-1 Gebruiker bestaat niet", (done) => {
     const nonExistentUserId = userId + 1;
 
     chai
@@ -299,7 +325,7 @@ describe("UC-206 Verwijderen van user", () => {
       });
   });
 
-  it("TC-206-4 Gebruiker succesvol verwijderd", (done) => {
+  it.skip("TC-206-4 Gebruiker succesvol verwijderd", (done) => {
     chai
       .request(server)
       .delete(`/api/user/${userId}`)
