@@ -393,6 +393,35 @@ describe("UC-205 Gebruiker wijzingen", () => {
       });
   });
 
+  it.skip("TC-205-3 Niet-valide telefoonnummer", (done) => {
+    const invalidPhoneNumber = "12345";
+
+    chai
+      .request(server)
+      .put(`/api/user/${userId}`)
+      .send({
+        firstName: "Test",
+        lastName: "Testter",
+        emailAddress: "t.estman@mail.com",
+        street: "123 Test St",
+        city: "Test city",
+        password: "Password123",
+        phoneNumber: invalidPhoneNumber,
+      })
+      .end((err, res) => {
+        expect(err).to.be.null;
+        expect(res).to.have.status(400);
+        expect(res.body).to.be.an("object");
+
+        const { status, message } = res.body;
+
+        expect(status).to.equal(400);
+        expect(message).to.equal("Phone number should be 10 digits long.");
+
+        done();
+      });
+  });
+
   it.skip("TC-205-4 Gebruiker bestaat niet", (done) => {
     const nonExistentUserId = userId + 1;
     chai
