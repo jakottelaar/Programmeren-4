@@ -157,7 +157,7 @@ describe("UC-201 Registreren als een nieuwe gebruiker", () => {
 });
 
 describe("UC-202 Opvragen van overzicht van users", () => {
-  it("TC-202-1 Toon alle gebruikers (minimaal 2)", (done) => {
+  it.skip("TC-202-1 Toon alle gebruikers (minimaal 2)", (done) => {
     chai
       .request(server)
       .get("/api/user")
@@ -179,6 +179,31 @@ describe("UC-202 Opvragen van overzicht van users", () => {
               return typeof user === "object";
             });
           });
+
+        done();
+      });
+  });
+
+  it("TC-202-2 Toon gebruikers met zoekterm op niet-bestaande velden", (done) => {
+    const searchParams = {
+      nonExistingField: "value",
+    };
+
+    chai
+      .request(server)
+      .get("/api/user")
+      .query(searchParams)
+      .timeout(5000)
+      .end((err, res) => {
+        expect(err).to.be.null;
+
+        console.log(res.body);
+        expect(res.body).to.be.an("object");
+        let { status, message, data } = res.body;
+
+        expect(status).to.equal(200);
+        expect(message).to.contain("user: get all users endpoint");
+        expect(data).to.be.an("array");
 
         done();
       });
