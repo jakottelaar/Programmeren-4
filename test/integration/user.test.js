@@ -39,7 +39,7 @@ describe("UC-201 Registreren als een nieuwe gebruiker", () => {
       });
   });
 
-  it.skip("TC-201-5 User succesvol geregistreer", (done) => {
+  it("TC-201-5 User succesvol geregistreer", (done) => {
     const newUser = {
       firstName: "Test",
       lastName: "Testter",
@@ -220,7 +220,7 @@ describe("UC-205 Gebruiker wijzingen", () => {
       });
   });
 
-  it("TC-205-4 Gebruiker bestaat niet", (done) => {
+  it.skip("TC-205-4 Gebruiker bestaat niet", (done) => {
     const nonExistentUserId = userId + 1;
     chai
       .request(server)
@@ -245,10 +245,45 @@ describe("UC-205 Gebruiker wijzingen", () => {
         done();
       });
   });
+
+  it("TC-205-6 Gebruiker succesvol gewijzigd", (done) => {
+    const updatedUser = {
+      firstName: "Testie",
+      lastName: "man",
+      emailAddress: "t.estman@example.com",
+      password: "Newpassword123",
+      street: "456 Elm St",
+      city: "Othertown",
+      phoneNumber: "0612345678",
+    };
+
+    chai
+      .request(server)
+      .put(`/api/user/${userId}`)
+      .send(updatedUser)
+      .end((err, res) => {
+        let { status, message, data } = res.body;
+        console.log(res.body);
+
+        expect(status).to.equal(200);
+        expect(res.body).to.be.an("object");
+        expect(message).to.equal("Updated user");
+
+        expect(data).to.be.an("object");
+        expect(data.firstName).to.equal(updatedUser.firstName);
+        expect(data.lastName).to.equal(updatedUser.lastName);
+        expect(data.emailAddress).to.equal(updatedUser.emailAddress);
+        expect(data.street).to.equal(updatedUser.street);
+        expect(data.city).to.equal(updatedUser.city);
+        expect(data.phoneNumber).to.equal(updatedUser.phoneNumber);
+
+        done();
+      });
+  });
 });
 
 describe("UC-206 Verwijderen van user", () => {
-  it.skip("TC-206-4 Gebruiker succesvol verwijderd", (done) => {
+  it("TC-206-4 Gebruiker succesvol verwijderd", (done) => {
     chai
       .request(server)
       .delete(`/api/user/${userId}`)
