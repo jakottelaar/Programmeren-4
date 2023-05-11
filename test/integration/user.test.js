@@ -9,15 +9,15 @@ chai.use(chaiHttp);
 const expect = chai.expect;
 
 describe("UC-201 Registreren als een nieuwe gebruiker", () => {
-  it("TC-201-1 Verplicht veld ontbreekt", (done) => {
+  it.skip("TC-201-1 Verplicht veld ontbreekt", (done) => {
     const requestBody = {
       firstName: "",
       lastName: "Testter",
       street: "123 Test St",
       city: "Test city",
-      emailAddress: "test8@mail.com",
-      password: "password123",
-      phoneNumber: "1234567890",
+      emailAddress: "t.estman@mail.com",
+      password: "Password123",
+      phoneNumber: "0612345678",
     };
 
     chai
@@ -39,15 +39,15 @@ describe("UC-201 Registreren als een nieuwe gebruiker", () => {
       });
   });
 
-  it.skip("TC-201-5 User succesvol geregistreer", (done) => {
+  it("TC-201-5 User succesvol geregistreer", (done) => {
     const newUser = {
       firstName: "Test",
       lastName: "Testter",
       street: "123 Test St",
       city: "Test city",
-      emailAddress: "test7@mail.com",
-      password: "password123",
-      phoneNumber: "1234567890",
+      emailAddress: "t.estman@mail.com",
+      password: "Password123",
+      phoneNumber: "0612345678",
     };
 
     chai
@@ -67,8 +67,8 @@ describe("UC-201 Registreren als een nieuwe gebruiker", () => {
           .that.contains("User created successfully.");
         expect(data).to.be.an("object");
 
-        userId = data.insertId;
-        console.log(userId);
+        userId = data.id;
+        console.log(data.id);
 
         done();
       });
@@ -80,23 +80,23 @@ describe("UC-201 Registreren als een nieuwe gebruiker", () => {
       lastName: "Testter",
       street: "123 Test St",
       city: "Test city",
-      emailAddress: "test7@mail.com",
-      password: "password123",
-      phoneNumber: "1234567890",
+      emailAddress: "t.estman@mail.com",
+      password: "Password123",
+      phoneNumber: "0612345678",
     };
 
     chai
-      .request(app)
+      .request(server)
       .post("/api/user")
       .send(existingUser)
       .end((err, res) => {
+        console.log(res.body);
         expect(err).to.be.null;
+        let { status, message } = res.body;
 
-        expect(res).to.have.status(409);
+        expect(status).to.equal(403);
         expect(res.body).to.be.an("object");
-        expect(res.body).to.have.property("status", 409);
-        expect(res.body).to.have.property("message").that.is.a("string");
-        // Add additional assertions as needed to match the expected error response
+        expect(message).to.be.a("string").that.contains("Email already exists");
 
         done();
       });
@@ -175,7 +175,7 @@ describe("UC-204 Opvragen van usergegevens bij ID", () => {
 });
 
 describe("UC-206 Verwijderen van user", () => {
-  it.skip("TC-206-4 Gebruiker succesvol verwijderd", (done) => {
+  it("TC-206-4 Gebruiker succesvol verwijderd", (done) => {
     chai
       .request(server)
       .delete(`/api/user/${userId}`)

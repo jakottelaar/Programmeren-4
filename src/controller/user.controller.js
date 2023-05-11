@@ -73,14 +73,22 @@ const userController = {
     pool.query(sqlStatement, newUser, function (error, results, fields) {
       if (error) {
         console.log(error);
-        res.status(500).json({
-          status: 500,
-          message: "Failed to create new user.",
-          error: error,
-        });
+        if (error.code === "ER_DUP_ENTRY") {
+          res.status(403).json({
+            status: 403,
+            message: "Email already exists. User creation failed.",
+          });
+        } else {
+          res.status(500).json({
+            status: 500,
+            message: "Failed to create new user.",
+            error: error,
+          });
+        }
       } else {
         const createdUserId = results.insertId;
 
+        const selectStatement = "SELECT * FROM user WHERE id = ?";
         pool.query(
           selectStatement,
           createdUserId,
