@@ -1,13 +1,14 @@
 const mysql = require("mysql2");
 require("dotenv").config();
+console.log(process.env);
 
 // Create the connection pool. The pool-specific settings are the defaults
 
 const pool = mysql.createPool({
   host: process.env.DB_HOST || "localhost",
   user: process.env.DB_USER || "root",
-  password: process.env.DB_PASSWORD || "",
-  database: process.env.DB_NAME || "share-a-meal-db",
+  password: process.env.DB_PASSWORD || "root",
+  database: process.env.DB_NAME || "shareameal",
   port: process.env.DB_PORT || 3306,
   waitForConnections: true,
   connectionLimit: 10,
