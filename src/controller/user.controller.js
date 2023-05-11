@@ -68,6 +68,7 @@ const userController = {
     };
 
     let sqlStatement = "INSERT INTO user SET ?";
+    let selectStatement = "SELECT * FROM user WHERE id = ?";
 
     pool.query(sqlStatement, newUser, function (error, results, fields) {
       if (error) {
@@ -78,12 +79,36 @@ const userController = {
           error: error,
         });
       } else {
-        logger.info("Insert new user by id: ", results.insertId);
-        res.status(200).json({
-          status: 200,
-          message: "User created successfully.",
-          data: results,
-        });
+        const createdUserId = results.insertId;
+
+        pool.query(
+          selectStatement,
+          createdUserId,
+          function (error, rows, fields) {
+            if (error) {
+              console.log(error);
+              res.status(500).json({
+                status: 500,
+                message: "Failed to fetch user information.",
+                error: error,
+              });
+            } else if (rows.length === 0) {
+              res.status(404).json({
+                status: 404,
+                message: `No user found with ID ${createdUserId}.`,
+              });
+            } else {
+              const createdUser = rows[0];
+
+              logger.info("Inserted new user with id:", createdUserId);
+              res.status(200).json({
+                status: 200,
+                message: "User created successfully.",
+                data: createdUser,
+              });
+            }
+          }
+        );
       }
     });
   },
