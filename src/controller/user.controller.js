@@ -23,6 +23,7 @@ const userController = {
         typeof emailAddress === "string",
         "emailAddress must be a string!"
       );
+      assert(Object.values(req.body).every((field) => field !== null));
     } catch (err) {
       res.status(400).json({
         status: 400,
