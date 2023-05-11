@@ -92,14 +92,8 @@ const userController = {
                 message: "Failed to fetch user information.",
                 error: error,
               });
-            } else if (rows.length === 0) {
-              res.status(404).json({
-                status: 404,
-                message: `No user found with ID ${createdUserId}.`,
-              });
             } else {
               const createdUser = rows[0];
-
               logger.info("Inserted new user with id:", createdUserId);
               res.status(200).json({
                 status: 200,
