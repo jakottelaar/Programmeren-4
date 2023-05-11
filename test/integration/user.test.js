@@ -15,7 +15,7 @@ describe("UC-201 Registreren als een nieuwe gebruiker", () => {
       lastName: "Testter",
       street: "123 Test St",
       city: "Test city",
-      email: "test7@mail.com",
+      emailAddress: "test7@mail.com",
       password: "password123",
       phoneNumber: "1234567890",
     };
