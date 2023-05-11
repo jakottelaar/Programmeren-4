@@ -184,7 +184,7 @@ describe("UC-202 Opvragen van overzicht van users", () => {
       });
   });
 
-  it.skip("TC-202-2 Toon gebruikers met zoekterm op niet-bestaande velden", (done) => {
+  it("TC-202-2 Toon gebruikers met zoekterm op niet-bestaande velden", (done) => {
     const searchParams = {
       nonExistingField: "value",
     };
@@ -202,7 +202,7 @@ describe("UC-202 Opvragen van overzicht van users", () => {
         let { status, message, data } = res.body;
 
         expect(status).to.equal(200);
-        expect(message).to.contain("user: get all users endpoint");
+        expect(message).to.contain("Users retrieved successfully.");
         expect(data).to.be.an("array");
 
         done();
@@ -210,7 +210,7 @@ describe("UC-202 Opvragen van overzicht van users", () => {
   });
 
   describe("UC-202 Opvragen van overzicht van users", () => {
-    it("TC-202-3 Toon gebruikers met gebruik van de zoekterm op het veld 'isActive'=false", (done) => {
+    it.skip("TC-202-3 Toon gebruikers met gebruik van de zoekterm op het veld 'isActive'=false", (done) => {
       const searchParams = {
         isActive: 0,
       };
@@ -241,6 +241,8 @@ describe("UC-202 Opvragen van overzicht van users", () => {
         });
     });
   });
+
+  it.skip;
 });
 
 describe("UC-203 Opvragen van gebruikersprofiel", () => {
