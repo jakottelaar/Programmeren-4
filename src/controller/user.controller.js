@@ -5,14 +5,24 @@ const pool = require("../util/mysql");
 const userController = {
   //Post request for registration of a new user
   createNewUser: (req, res) => {
-    const { firstName, lastName, street, city, email, password, phoneNumber } =
-      req.body;
+    const {
+      firstName,
+      lastName,
+      street,
+      city,
+      emailAddress,
+      password,
+      phoneNumber,
+    } = req.body;
 
     console.log(req.body);
 
     try {
       assert(typeof firstName === "string", "firstName must be a string!");
-      assert(typeof email === "string", "emailAddress must be a string!");
+      assert(
+        typeof emailAddress === "string",
+        "emailAddress must be a string!"
+      );
     } catch (err) {
       res.status(400).json({
         status: 400,
@@ -26,8 +36,7 @@ const userController = {
       lastName,
       street,
       city,
-      isActive: 1,
-      email,
+      emailAddress,
       password,
       phoneNumber,
     };
