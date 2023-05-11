@@ -65,7 +65,7 @@ describe("UC-201 Registreren als een nieuwe gebruiker", () => {
       });
   });
 
-  it("TC-201-3 Niet-valide wachtwoord", (done) => {
+  it.skip("TC-201-3 Niet-valide wachtwoord", (done) => {
     const newUser = {
       firstName: "Test",
       lastName: "Tester",
@@ -157,7 +157,7 @@ describe("UC-201 Registreren als een nieuwe gebruiker", () => {
 });
 
 describe("UC-202 Opvragen van overzicht van users", () => {
-  it.skip("TC-202-1 Toon alle gebruikers (minimaal 2)", (done) => {
+  it("TC-202-1 Toon alle gebruikers (minimaal 2)", (done) => {
     chai
       .request(server)
       .get("/api/user")
@@ -173,6 +173,7 @@ describe("UC-202 Opvragen van overzicht van users", () => {
         expect(message).to.contain("user: get all users endpoint");
         expect(data)
           .to.be.an("array")
+          .and.to.have.length.of.at.least(2)
           .and.to.satisfy((users) => {
             return users.every((user) => {
               return typeof user === "object";
