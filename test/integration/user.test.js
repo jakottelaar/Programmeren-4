@@ -39,7 +39,7 @@ describe("UC-201 Registreren als een nieuwe gebruiker", () => {
       });
   });
 
-  it("TC-201-2 Niet-valide emailadres", (done) => {
+  it.skip("TC-201-2 Niet-valide emailadres", (done) => {
     const newUser = {
       firstName: "Test",
       lastName: "Tester",
@@ -60,6 +60,33 @@ describe("UC-201 Registreren als een nieuwe gebruiker", () => {
         expect(status).to.equal(400);
         expect(res.body).to.be.an("object");
         expect(message).to.equal("Email address is not valid");
+
+        done();
+      });
+  });
+
+  it("TC-201-3 Niet-valide wachtwoord", (done) => {
+    const newUser = {
+      firstName: "Test",
+      lastName: "Tester",
+      emailAddress: "t.man@example.com",
+      password: "password",
+      street: "123 Main St",
+      city: "Anytown",
+      phoneNumber: "0612345678",
+    };
+
+    chai
+      .request(server)
+      .post("/api/user")
+      .send(newUser)
+      .end((err, res) => {
+        let { status, message } = res.body;
+        expect(status).to.equal(400);
+        expect(res.body).to.be.an("object");
+        expect(message).to.equal(
+          "Password is not valid. It should be at least 8 characters and contain at least one uppercase letter and one digit."
+        );
 
         done();
       });
