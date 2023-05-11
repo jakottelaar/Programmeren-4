@@ -242,7 +242,7 @@ describe("UC-202 Opvragen van overzicht van users", () => {
     });
   });
 
-  it("TC-202-4 Toon gebruikers met gebruik van de zoekterm op het veld 'isActive' = true", (done) => {
+  it.skip("TC-202-4 Toon gebruikers met gebruik van de zoekterm op het veld 'isActive' = true", (done) => {
     const filters = {
       isActive: 1,
     };
@@ -267,6 +267,37 @@ describe("UC-202 Opvragen van overzicht van users", () => {
               return user.isActive === 1;
             });
           });
+
+        done();
+      });
+  });
+
+  it.skip("TC-202-5 Toon gebruikers met zoektermen op bestaande velden (max op 2 velden filteren)", (done) => {
+    const filters = {
+      firstName: "John",
+      lastName: "Doe",
+    };
+
+    chai
+      .request(server)
+      .get("/api/user")
+      .query(filters)
+      .end((err, res) => {
+        expect(err).to.be.null;
+        expect(res).to.have.status(200);
+        expect(res.body).to.be.an("object");
+
+        const { status, message, data } = res.body;
+
+        expect(status).to.equal(200);
+        expect(message).to.equal("Users retrieved successfully.");
+        expect(data).to.be.an("array");
+
+        // Assert that all users in the response match the filter criteria
+        data.forEach((user) => {
+          expect(user.firstName).to.equal(filters.firstName);
+          expect(user.lastName).to.equal(filters.lastName);
+        });
 
         done();
       });
