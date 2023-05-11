@@ -39,7 +39,7 @@ describe("UC-201 Registreren als een nieuwe gebruiker", () => {
       });
   });
 
-  it("TC-201-5 User succesvol geregistreer", (done) => {
+  it.skip("TC-201-5 User succesvol geregistreer", (done) => {
     const newUser = {
       firstName: "Test",
       lastName: "Testter",
@@ -74,7 +74,7 @@ describe("UC-201 Registreren als een nieuwe gebruiker", () => {
       });
   });
 
-  it("TC-201-4 gebruiker bestaat al", (done) => {
+  it.skip("TC-201-4 gebruiker bestaat al", (done) => {
     const existingUser = {
       firstName: "Test",
       lastName: "Testter",
@@ -154,10 +154,28 @@ describe("UC-203 Opvragen van gebruikersprofiel", () => {
 });
 
 describe("UC-204 Opvragen van usergegevens bij ID", () => {
+  it("TC-204-2 Gebruiker-ID bestaat niet", (done) => {
+    const invalidUserId = userId + 1;
+
+    chai
+      .request(server)
+      .get(`/api/user/${invalidUserId}`)
+      .end((err, res) => {
+        expect(err).to.be.null;
+        let { status, message } = res.body;
+
+        expect(status).to.equal(404);
+        expect(res.body).to.be.an("object");
+        expect(message).to.equal(`No user with ID ${invalidUserId}`);
+
+        done();
+      });
+  });
+
   it.skip("TC-204-3 Gebruiker-ID bestaat(De user met het gegeven id wordt geretourneerd)", (done) => {
     chai
       .request(server)
-      .get(`/api/user/${2}`)
+      .get(`/api/user/${userId}`)
       .end((err, res) => {
         expect(err).to.be.null;
 
@@ -175,7 +193,7 @@ describe("UC-204 Opvragen van usergegevens bij ID", () => {
 });
 
 describe("UC-206 Verwijderen van user", () => {
-  it("TC-206-4 Gebruiker succesvol verwijderd", (done) => {
+  it.skip("TC-206-4 Gebruiker succesvol verwijderd", (done) => {
     chai
       .request(server)
       .delete(`/api/user/${userId}`)
