@@ -105,8 +105,8 @@ const userController = {
             } else {
               const createdUser = rows[0];
               logger.info("Inserted new user with id:", createdUserId);
-              res.status(200).json({
-                status: 200,
+              res.status(201).json({
+                status: 201,
                 message: "User created successfully.",
                 data: createdUser,
               });
