@@ -51,6 +51,7 @@ const userController = {
       res.status(400).json({
         status: 400,
         message: error.details[0].message,
+        data: {},
       });
       return;
     }
@@ -77,6 +78,7 @@ const userController = {
           res.status(403).json({
             status: 403,
             message: "Email already exists. User creation failed.",
+            data: {},
           });
         } else {
           res.status(500).json({
@@ -180,6 +182,7 @@ const userController = {
         res.status(404).json({
           status: 404,
           message: `No user with ID ${userId}`,
+          data: {},
         });
       } else {
         logger.info("Retrieved user by id: ", userId);
@@ -202,6 +205,7 @@ const userController = {
       res.status(400).json({
         status: 400,
         message: error.details[0].message,
+        data: {},
       });
       return;
     }
@@ -223,6 +227,7 @@ const userController = {
           res.status(404).json({
             status: 404,
             message: `No user with ID ${userId}`,
+            data: {},
           });
         } else {
           logger.info(`Updated user by id: ${userId}`);
@@ -270,6 +275,7 @@ const userController = {
         res.status(404).json({
           status: 404,
           message: `No user with ID ${userId}`,
+          data: {},
         });
       } else {
         logger.info("Deleted user by id: ", userId);
