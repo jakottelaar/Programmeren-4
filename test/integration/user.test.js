@@ -114,7 +114,7 @@ describe("UC-201 Registreren als een nieuwe gebruiker", () => {
         expect(res.body).to.be.an("object");
         let { status, message, data } = res.body;
 
-        expect(status).to.equal(200);
+        expect(status).to.equal(201);
         expect(message)
           .to.be.a("string")
           .that.contains("User created successfully.");
