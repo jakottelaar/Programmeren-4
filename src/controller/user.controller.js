@@ -44,16 +44,16 @@ const userController = {
   createNewUser: (req, res) => {
     const input = req.body;
 
-    // const { error, value } = validateUserInput(input);
+    const { error, value } = validateUserInput(input);
 
-    // if (error) {
-    //   res.status(400).json({
-    //     status: 400,
-    //     message: error.details[0].message,
-    //     data: {},
-    //   });
-    //   return;
-    // }
+    if (error) {
+      res.status(400).json({
+        status: 400,
+        message: error.details[0].message,
+        data: {},
+      });
+      return;
+    }
 
     console.log(req.body);
 
@@ -198,16 +198,16 @@ const userController = {
     const userId = parseInt(req.params.userId);
     const updatedUser = req.body;
 
-    // const { error, value } = validateUserInput(updatedUser);
+    const { error, value } = validateUserInput(updatedUser);
 
-    // if (error) {
-    //   res.status(400).json({
-    //     status: 400,
-    //     message: error.details[0].message,
-    //     data: {},
-    //   });
-    //   return;
-    // }
+    if (error) {
+      res.status(400).json({
+        status: 400,
+        message: error.details[0].message,
+        data: {},
+      });
+      return;
+    }
 
     let sqlStatement = "UPDATE user SET ? WHERE id = ?";
 
@@ -280,7 +280,7 @@ const userController = {
         logger.info("Deleted user by id: ", userId);
         res.status(200).json({
           status: 200,
-          message: `User deleted by id ${userId}`,
+          message: `User met ID ${userId} is verwijderd`,
           data: results,
         });
       }
