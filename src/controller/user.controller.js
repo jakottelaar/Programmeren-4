@@ -25,15 +25,15 @@ function validateUserInput(user) {
         "any.required": `Password is required`,
         "string.pattern.base": `Password is not valid. It should be at least 8 characters and contain at least one uppercase letter and one digit.`,
       }),
-    phoneNumber: Joi.string()
-      .length(10, 11)
+    phoneNumber: Joi.alternatives()
+      .try(Joi.string().length(10), Joi.string().length(11))
       .pattern(/^(06[-\s]?\d{8}|\d{10})$/)
       .required()
       .messages({
         "string.empty": `Phone number cannot be empty`,
         "any.required": `Phone number is required`,
         "string.pattern.base": `Phone number is not valid. It should start with '06' and be followed by 8 digits.`,
-        "string.length": `Phone number should be 10 digits long.`,
+        "string.length": `Phone number should be either 10 or 11 digits long.`,
       }),
   });
 
