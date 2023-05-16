@@ -11,7 +11,7 @@ function validateUserInput(user) {
     city: Joi.string().allow("").required(),
     emailAddress: Joi.string()
       .pattern(
-        new RegExp(/^[a-zA-Z]\.[a-zA-Z]{2,}@([a-zA-Z]{2,}\.[a-zA-Z]{2,3})$/)
+        new RegExp(/^[a-zA-Z]\.[a-zA-Z0-9]{2,}@([a-zA-Z]{2,}\.[a-zA-Z]{2,3})$/)
       )
       .required()
       .messages({
