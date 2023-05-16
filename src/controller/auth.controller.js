@@ -102,37 +102,28 @@ module.exports = {
   //
   //
   validateToken(req, res, next) {
-    logger.trace("validateToken called");
-
     const authHeader = req.headers.authorization;
-    if (!authHeader) {
-      return next({
+
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return res.status(401).json({
         status: 401,
-        message: "Authorization header missing!",
+        message: "Unauthorized: Missing or invalid token",
         data: undefined,
       });
     }
 
-    // Extract the token from the authorization header
-    const token = authHeader.replace("Bearer ", "");
+    const token = authHeader.split(" ")[1];
 
     try {
-      // Verify and decode the token
       const decoded = jwt.verify(token, jwtSecretKey);
 
-      // Extract the user ID from the decoded payload
-      const userId = decoded.userId;
+      req.userId = decoded.userId;
 
-      // Store the user ID in the req object for further use
-      req.userId = userId;
-
-      // Proceed to the next middleware or route handler
       next();
     } catch (err) {
-      // Handle token verification errors
-      return next({
+      return res.status(401).json({
         status: 401,
-        message: "Invalid token!",
+        message: "Unauthorized: Invalid token",
         data: undefined,
       });
     }
