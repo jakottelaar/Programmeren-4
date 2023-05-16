@@ -27,7 +27,7 @@ function validateUserInput(user) {
       }),
     phoneNumber: Joi.string()
       .length(10)
-      .pattern(/^06[-\s]?\d{8}$/)
+      .pattern(/^(06[-\s]?\d{8}|\d{10})$/)
       .required()
       .messages({
         "string.empty": `Phone number cannot be empty`,
