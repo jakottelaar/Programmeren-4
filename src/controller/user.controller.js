@@ -25,9 +25,8 @@ function validateUserInput(user) {
         "any.required": `Password is required`,
         "string.pattern.base": `Password is not valid. It should be at least 8 characters and contain at least one uppercase letter and one digit.`,
       }),
-    phoneNumber: Joi.alternatives()
-      .try(Joi.string().length(10), Joi.string().length(11))
-      .pattern(/^(06[-\s]?\d{8}|\d{10})$/)
+    phoneNumber: Joi.string()
+      .pattern(/^(06[-\s]?\d{8}|\d{10,11})$/)
       .required()
       .messages({
         "string.empty": `Phone number cannot be empty`,
