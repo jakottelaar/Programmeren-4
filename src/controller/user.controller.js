@@ -3,48 +3,44 @@ const assert = require("assert");
 const pool = require("../util/mysql");
 const Joi = require("joi");
 
-function validateUserInput(user) {
-  const schema = Joi.object({
-    firstName: Joi.string().required(),
-    lastName: Joi.string().min(2).required(),
-    street: Joi.string().allow("").required(),
-    city: Joi.string().allow("").required(),
-    emailAddress: Joi.string()
-      .pattern(
-        new RegExp(/^[a-zA-Z]\.[a-zA-Z0-9]{2,}@([a-zA-Z]{2,}\.[a-zA-Z]{2,3})$/)
-      )
-      .required()
-      .messages({
-        "string.pattern.base": `Email address is not valid`,
-      }),
-    password: Joi.string()
-      .pattern(/^(?=.*[A-Z])(?=.*\d).{8,}$/)
-      .required()
-      .messages({
-        "string.empty": `Password address cannot be empty`,
-        "any.required": `Password is required`,
-        "string.pattern.base": `Password is not valid. It should be at least 8 characters and contain at least one uppercase letter and one digit.`,
-      }),
-    phoneNumber: Joi.string()
-      .pattern(/^(06[-\s]?\d{8}|\d{10,11})$/)
-      .required()
-      .messages({
-        "string.empty": `Phone number cannot be empty`,
-        "any.required": `Phone number is required`,
-        "string.pattern.base": `Phone number is not valid. It should start with '06' and be followed by 8 digits.`,
-        "string.length": `Phone number should be either 10 or 11 digits long.`,
-      }),
-  });
-
-  return schema.validate(user);
-}
+const schema = Joi.object({
+  firstName: Joi.string().required(),
+  lastName: Joi.string().min(2).required(),
+  street: Joi.string().allow("").required(),
+  city: Joi.string().allow("").required(),
+  emailAddress: Joi.string()
+    .pattern(
+      new RegExp(/^[a-zA-Z]\.[a-zA-Z0-9]{2,}@([a-zA-Z]{2,}\.[a-zA-Z]{2,3})$/)
+    )
+    .required()
+    .messages({
+      "string.pattern.base": `Email address is not valid`,
+    }),
+  password: Joi.string()
+    .pattern(/^(?=.*[A-Z])(?=.*\d).{8,}$/)
+    .required()
+    .messages({
+      "string.empty": `Password address cannot be empty`,
+      "any.required": `Password is required`,
+      "string.pattern.base": `Password is not valid. It should be at least 8 characters and contain at least one uppercase letter and one digit.`,
+    }),
+  phoneNumber: Joi.string()
+    .pattern(/^(06[-\s]?\d{8}|\d{10,11})$/)
+    .required()
+    .messages({
+      "string.empty": `Phone number cannot be empty`,
+      "any.required": `Phone number is required`,
+      "string.pattern.base": `Phone number is not valid. It should start with '06' and be followed by 8 digits.`,
+      "string.length": `Phone number should be either 10 or 11 digits long.`,
+    }),
+});
 
 const userController = {
   //Post request for registration of a new user
   createNewUser: (req, res) => {
     const input = req.body;
 
-    const { error, value } = validateUserInput(input);
+    const { error, value } = schema.validate(input);
 
     if (error) {
       res.status(400).json({
