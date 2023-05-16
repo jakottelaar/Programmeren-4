@@ -11,7 +11,7 @@ function validateUserInput(user) {
     city: Joi.string().allow("").required(),
     emailAddress: Joi.string()
       .pattern(
-        new RegExp(/^[a-zA-Z]\.[a-zA-Z]{2,}@([a-zA-Z]{2,}\.[a-zA-Z]{2,3})$/)
+        new RegExp(/^[a-zA-Z]\.[a-zA-Z0-9]{2,}@([a-zA-Z]{2,}\.[a-zA-Z]{2,3})$/)
       )
       .required()
       .messages({
@@ -26,14 +26,13 @@ function validateUserInput(user) {
         "string.pattern.base": `Password is not valid. It should be at least 8 characters and contain at least one uppercase letter and one digit.`,
       }),
     phoneNumber: Joi.string()
-      .length(10)
-      .pattern(/^06[-\s]?\d{8}$/)
+      .pattern(/^(06[-\s]?\d{8}|\d{10,11})$/)
       .required()
       .messages({
         "string.empty": `Phone number cannot be empty`,
         "any.required": `Phone number is required`,
         "string.pattern.base": `Phone number is not valid. It should start with '06' and be followed by 8 digits.`,
-        "string.length": `Phone number should be 10 digits long.`,
+        "string.length": `Phone number should be either 10 or 11 digits long.`,
       }),
   });
 
