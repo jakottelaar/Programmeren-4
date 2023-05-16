@@ -30,6 +30,9 @@ app.get("/api/info", (req, res) => {
 const userRoutes = require("./src/routes/user.routes");
 app.use("/api/user", userRoutes);
 
+const loginRoutes = require("./src/routes/auth.routes");
+app.use("/api/login", loginRoutes);
+
 app.use("*", (req, res) => {
   logger.warn("Invalid endpoint called: ", req.path);
   res.status(404).json({
