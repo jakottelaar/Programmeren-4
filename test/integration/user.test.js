@@ -1,9 +1,9 @@
-const assert = require("assert");
 const chai = require("chai");
 const chaiHttp = require("chai-http");
 const server = require("../../app");
-const exp = require("constants");
+const { logger } = require("../../src/util/utils");
 let userId = 0; //This userId will get the id assignment from the first create user test and use it throughout all the tests up and until it's deleted;
+let token = 0;
 
 chai.use(chaiHttp);
 const expect = chai.expect;
@@ -309,10 +309,23 @@ describe("UC-202 Opvragen van overzicht van users", () => {
 });
 
 describe("UC-203 Opvragen van gebruikersprofiel", () => {
+  before((done) => {
+    chai
+      .request(server)
+      .post("/api/login")
+      .send({ emailAddress: "t.estman@mail.com", password: "Password123" })
+      .end((loginErr, loginRes) => {
+        token = loginRes.body.data.token;
+        logger.info(`Token created: ${token}`);
+        done();
+      });
+  });
+
   it("TC-203-2 Gebruiker is ingelogd met geldig token. (Niet getest op een token, er wordt alleen een fictief profiel geretouneerd)", (done) => {
     chai
       .request(server)
       .get("/api/user/profile")
+      .set("Authorization", `Bearer ${token}`)
       .end((err, res) => {
         expect(err).to.be.null;
 
@@ -468,6 +481,7 @@ describe("UC-205 Gebruiker wijzingen", () => {
     chai
       .request(server)
       .put(`/api/user/${userId}`)
+      .set("Authorization", `Bearer ${token}`)
       .send(updatedUser)
       .end((err, res) => {
         let { status, message, data } = res.body;
