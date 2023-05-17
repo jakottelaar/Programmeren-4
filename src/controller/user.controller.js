@@ -9,7 +9,7 @@ const schema = Joi.object({
   street: Joi.string().allow("").required(),
   city: Joi.string().allow("").required(),
   isActive: Joi.boolean(),
-  emailAdress: Joi.any.optional(),
+  emailAdress: Joi.any().optional(),
   emailAddress: Joi.string()
     .pattern(
       new RegExp(/^[a-zA-Z]\.[a-zA-Z0-9]{2,}@([a-zA-Z]{2,}\.[a-zA-Z]{2,3})$/)
