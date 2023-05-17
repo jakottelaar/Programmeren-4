@@ -2,6 +2,7 @@ const logger = require("../util/utils").logger;
 const assert = require("assert");
 const pool = require("../util/mysql");
 const Joi = require("joi");
+const { log } = require("console");
 
 const schema = Joi.object({
   firstName: Joi.string().required(),
@@ -184,7 +185,8 @@ const userController = {
           data: {},
         });
       } else {
-        logger.info("Retrieved user by id: ", userId);
+        logger.info(`Retrieved user by id: ${userId}`);
+        logger.info(`getUserById ${results}`);
         res.status(200).json({
           status: 200,
           message: "User retrieved by id successfully.",
@@ -209,11 +211,29 @@ const userController = {
       return;
     }
 
+    const allowedFields = [
+      "firstName",
+      "lastName",
+      "street",
+      "city",
+      "isActive",
+      "emailAddress",
+      "password",
+      "phoneNumber",
+    ];
+
+    const filteredInput = Object.keys(input)
+      .filter((key) => allowedFields.includes(key))
+      .reduce((obj, key) => {
+        obj[key] = input[key];
+        return obj;
+      }, {});
+
     let sqlStatement = "UPDATE user SET ? WHERE id = ?";
 
     pool.query(
       sqlStatement,
-      [input, userId],
+      [filteredInput, userId],
       function (error, results, fields) {
         if (error) {
           console.log(error);
@@ -281,7 +301,7 @@ const userController = {
         res.status(200).json({
           status: 200,
           message: `User met ID ${userId} is verwijderd`,
-          data: results,
+          data: {},
         });
       }
     });
