@@ -12,7 +12,7 @@ describe("UC-102 Informatie opvragen", function () {
       .get("/api/info")
       .end((err, res) => {
         expect(res.body).to.be.an("object");
-        expect(res.body).to.have.property("status").to.equal(201);
+        expect(res.body).to.have.property("status").to.equal(200);
         expect(res.body).to.have.property("message");
         expect(res.body).to.have.property("data");
 
