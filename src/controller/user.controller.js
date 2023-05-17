@@ -38,14 +38,13 @@ const schema = Joi.object({
 const userController = {
   //Post request for registration of a new user
   createNewUser: (req, res) => {
-    const input = req.body;
+    const input = schema.validate(req.body);
 
-    const { error, value } = schema.validate(input);
-
-    if (error) {
+    if (input.error) {
+      logger.error(input.error);
       res.status(400).json({
         status: 400,
-        message: error.details[0].message,
+        message: input.error.message,
         data: {},
       });
       return;
@@ -195,14 +194,14 @@ const userController = {
   //Put request for updating a user's profile
   updateUser: (req, res) => {
     const userId = parseInt(req.params.userId);
-    const updatedUser = req.body;
 
-    const { error, value } = validateUserInput(updatedUser);
+    const input = schema.validate(req.body);
 
-    if (error) {
+    if (input.error) {
+      logger.error(input.error);
       res.status(400).json({
         status: 400,
-        message: error.details[0].message,
+        message: input.error.message,
         data: {},
       });
       return;
