@@ -14,6 +14,7 @@ describe("UC-201 Registreren als een nieuwe gebruiker", () => {
       firstName: "",
       lastName: "Testter",
       street: "123 Test St",
+      isActive: true,
       city: "Test city",
       emailAddress: "t.estman@mail.com",
       password: "Password123",
@@ -44,6 +45,7 @@ describe("UC-201 Registreren als een nieuwe gebruiker", () => {
       firstName: "Test",
       lastName: "Tester",
       emailAddress: "invalidemail",
+      isActive: true,
       password: "Password123",
       street: "123 Main St",
       city: "Anytown",
@@ -98,6 +100,7 @@ describe("UC-201 Registreren als een nieuwe gebruiker", () => {
       lastName: "Testter",
       street: "123 Test St",
       city: "Test city",
+      isActive: true,
       emailAddress: "t.estman@mail.com",
       password: "Password123",
       phoneNumber: "0612345678",
@@ -133,6 +136,7 @@ describe("UC-201 Registreren als een nieuwe gebruiker", () => {
       lastName: "Testter",
       street: "123 Test St",
       city: "Test city",
+      isActive: true,
       emailAddress: "t.estman@mail.com",
       password: "Password123",
       phoneNumber: "0612345678",
@@ -416,7 +420,9 @@ describe("UC-205 Gebruiker wijzingen", () => {
         const { status, message } = res.body;
 
         expect(status).to.equal(400);
-        expect(message).to.equal("Phone number should be 10 digits long.");
+        expect(message).to.equal(
+          "Phone number is not valid. It should start with '06' and be followed by 8 digits."
+        );
 
         done();
       });
@@ -512,7 +518,7 @@ describe("UC-206 Verwijderen van user", () => {
         let { status, message } = res.body;
 
         expect(status).to.equal(200);
-        expect(message).to.equal(`User deleted by id ${userId}`);
+        expect(message).to.equal(`User met ID ${userId} is verwijderd`);
         done();
       });
   });
