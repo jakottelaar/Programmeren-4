@@ -8,6 +8,7 @@ const schema = Joi.object({
   lastName: Joi.string().min(2).required(),
   street: Joi.string().allow("").required(),
   city: Joi.string().allow("").required(),
+  isActive: Joi.boolean(),
   emailAddress: Joi.string()
     .pattern(
       new RegExp(/^[a-zA-Z]\.[a-zA-Z0-9]{2,}@([a-zA-Z]{2,}\.[a-zA-Z]{2,3})$/)
@@ -57,6 +58,7 @@ const userController = {
       lastName: input.lastName,
       street: input.street,
       city: input.city,
+      isActive: input.isActive,
       emailAddress: input.emailAddress,
       password: input.password,
       phoneNumber: input.phoneNumber,
