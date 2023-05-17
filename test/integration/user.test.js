@@ -416,7 +416,9 @@ describe("UC-205 Gebruiker wijzingen", () => {
         const { status, message } = res.body;
 
         expect(status).to.equal(400);
-        expect(message).to.equal("Phone number should be 10 digits long.");
+        expect(message).to.equal(
+          "Phone number is not valid. It should start with '06' and be followed by 8 digits."
+        );
 
         done();
       });
@@ -512,7 +514,7 @@ describe("UC-206 Verwijderen van user", () => {
         let { status, message } = res.body;
 
         expect(status).to.equal(200);
-        expect(message).to.equal(`User deleted by id ${userId}`);
+        expect(message).to.equal(`User met ID ${userId} is verwijderd`);
         done();
       });
   });

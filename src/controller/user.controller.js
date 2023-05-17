@@ -38,13 +38,13 @@ const schema = Joi.object({
 const userController = {
   //Post request for registration of a new user
   createNewUser: (req, res) => {
-    const input = schema.validate(req.body);
+    const { error, value: input } = schema.validate(req.body);
 
-    if (input.error) {
-      logger.error(input.error);
+    if (error) {
+      logger.error(error);
       res.status(400).json({
         status: 400,
-        message: input.error.message,
+        message: error.message,
         data: {},
       });
       return;
@@ -63,7 +63,6 @@ const userController = {
     };
 
     let sqlStatement = "INSERT INTO user SET ?";
-    let selectStatement = "SELECT * FROM user WHERE id = ?";
 
     pool.query(sqlStatement, newUser, function (error, results, fields) {
       if (error) {
@@ -195,13 +194,13 @@ const userController = {
   updateUser: (req, res) => {
     const userId = parseInt(req.params.userId);
 
-    const input = schema.validate(req.body);
+    const { error, value: input } = schema.validate(req.body);
 
-    if (input.error) {
-      logger.error(input.error);
+    if (error) {
+      logger.error(error);
       res.status(400).json({
         status: 400,
-        message: input.error.message,
+        message: error.message,
         data: {},
       });
       return;
@@ -211,7 +210,7 @@ const userController = {
 
     pool.query(
       sqlStatement,
-      [updatedUser, userId],
+      [input, userId],
       function (error, results, fields) {
         if (error) {
           console.log(error);
