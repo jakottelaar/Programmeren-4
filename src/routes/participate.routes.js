@@ -12,4 +12,9 @@ participateRouter.delete(
   participantController.cancelRegistrationForMeal
 );
 
+participateRouter.get(
+  "/:mealId/participants",
+  participantController.getAllParticipants
+);
+
 module.exports = participateRouter;

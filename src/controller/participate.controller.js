@@ -65,6 +65,61 @@ const participateController = {
       }
     );
   },
+
+  getAllParticipants: (req, res) => {
+    const mealId = req.params.mealId;
+
+    let getParticipantsSqlStatement = `
+      SELECT *
+      FROM meal_participants_user mp
+      INNER JOIN user u ON mp.userId = u.id
+      WHERE mp.mealId = ?
+    `;
+
+    pool.query(
+      getParticipantsSqlStatement,
+      mealId,
+      function (error, results, fields) {
+        if (error) {
+          logger.error(error);
+
+          res.status(500).json({
+            status: 500,
+            message: "Failed to retrieve participants",
+            data: {
+              error: error,
+            },
+          });
+        } else {
+          const convertedResults = results.map((participant) => ({
+            ...participant,
+            isActive: participant.isActive === 1 ? true : false,
+          }));
+          const participantsByMeal = convertedResults.reduce(
+            (acc, participant) => {
+              const mealId = participant.mealId;
+              if (!acc[mealId]) {
+                acc[mealId] = [];
+              }
+              delete participant.password;
+              delete participant.userId;
+              delete participant.mealId;
+              delete participant.roles;
+              acc[mealId].push(participant);
+              return acc;
+            },
+            {}
+          );
+
+          res.status(200).json({
+            status: 200,
+            message: "Participants retrieved successfully",
+            data: participantsByMeal,
+          });
+        }
+      }
+    );
+  },
 };
 
 module.exports = participateController;
