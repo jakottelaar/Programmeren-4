@@ -122,6 +122,31 @@ const mealController = {
       }
     });
   },
+
+  getMealById: (req, res) => {
+    let sqlSelectStatement = "SELECT * FROM `meal` WHERE id = ?";
+
+    const mealId = parseInt(req.params.mealId);
+
+    pool.query(sqlSelectStatement, mealId, function (error, results, fields) {
+      if (error) {
+        logger.error(error);
+        res.status(500).json({
+          status: 500,
+          message: "Failed to fetch meal by id",
+          data: {
+            error,
+          },
+        });
+      } else {
+        res.status(200).json({
+          status: 200,
+          message: `Meal fetched by id`,
+          data: results,
+        });
+      }
+    });
+  },
 };
 
 module.exports = mealController;
