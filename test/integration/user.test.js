@@ -416,6 +416,7 @@ describe("UC-205 Gebruiker wijzingen", () => {
     chai
       .request(server)
       .put(`/api/user/${userId}`)
+      .set("Authorization", `Bearer ${token}`)
       .send({
         firstName: "Test",
         lastName: "Testter",
@@ -446,6 +447,7 @@ describe("UC-205 Gebruiker wijzingen", () => {
     chai
       .request(server)
       .put(`/api/user/${nonExistentUserId}`)
+      .set("Authorization", `Bearer ${token}`)
       .send({
         firstName: "Test",
         lastName: "Tester",
