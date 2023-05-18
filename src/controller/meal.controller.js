@@ -228,6 +228,42 @@ const mealController = {
       }
     });
   },
+
+  deleteMealById: (req, res) => {
+    const mealId = parseInt(req.params.mealId);
+    logger.info(mealId);
+
+    let deleteMealSqlStatement = "DELETE FROM `meal` WHERE id = ?";
+
+    pool.query(
+      deleteMealSqlStatement,
+      mealId,
+      function (error, results, fields) {
+        if (error) {
+          logger.error(error);
+          res.status(500).json({
+            status: 500,
+            message: "Failed to delete meal by id",
+            data: {
+              error,
+            },
+          });
+        } else if (results.affectedRows === 0) {
+          res.status(404).json({
+            status: 404,
+            message: `No meal with ID ${userId}`,
+            data: {},
+          });
+        } else {
+          res.status(200).json({
+            status: 200,
+            message: `Maaltijd met ID ${mealId} is verwijderd`,
+            data: {},
+          });
+        }
+      }
+    );
+  },
 };
 
 module.exports = mealController;
