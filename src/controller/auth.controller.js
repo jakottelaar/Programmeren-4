@@ -22,6 +22,7 @@ module.exports = {
         return next({
           status: 500,
           message: err.code,
+          data: {},
         });
       }
 
@@ -34,13 +35,16 @@ module.exports = {
             return next({
               status: 500,
               message: error.message,
+              data: {},
             });
           }
 
           if (results.length === 0) {
             // User not found
-            return res.status(401).json({
-              message: "Not authorized",
+            return res.status(404).json({
+              status: 404,
+              message: "User not found",
+              data: {},
             });
           }
 
@@ -49,8 +53,10 @@ module.exports = {
           // Check password
           if (user.password !== password) {
             // Incorrect password
-            return res.status(401).json({
-              message: "Not authorized",
+            return res.status(400).json({
+              status: 400,
+              message: "Invalid password",
+              data: {},
             });
           }
 
@@ -83,16 +89,23 @@ module.exports = {
    */
   validateLogin(req, res, next) {
     const schema = Joi.object({
-      emailAddress: Joi.string().required().label("Email Address"),
-      password: Joi.string().required().label("Password"),
+      emailAddress: Joi.string()
+        .required()
+        .label("Email Address")
+        .messages({ "any.required": `Email address is required` }),
+      password: Joi.string()
+        .required()
+        .label("Password")
+        .messages({ "any.required": `Password is required` }),
     });
 
     const { error } = schema.validate(req.body);
 
     if (error) {
-      return res.status(422).json({
-        error: error.details[0].message,
-        datetime: new Date().toISOString(),
+      return res.status(400).json({
+        status: 400,
+        message: error.details[0].message,
+        data: {},
       });
     }
     next();

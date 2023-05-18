@@ -60,7 +60,7 @@ const userController = {
       lastName: input.lastName,
       street: input.street,
       city: input.city,
-      isActive: input.isActive,
+      isActive: input.isActive || 1,
       emailAddress: input.emailAddress,
       password: input.password,
       phoneNumber: input.phoneNumber,
