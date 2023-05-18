@@ -3,7 +3,20 @@ const pool = require("../util/mysql");
 const Joi = require("joi");
 const DATE_FORMATER = require("dateformat");
 
-const schema = Joi.object({
+const createMealSchema = Joi.object({
+  name: Joi.string().required(),
+  description: Joi.string().required(),
+  isVega: Joi.number().optional(),
+  isVegan: Joi.number().optional(),
+  isToTakeHome: Joi.number().optional(),
+  isActive: Joi.number().optional(),
+  price: Joi.number().required(),
+  maxAmountOfParticipants: Joi.number().required(),
+  imageUrl: Joi.string().required(),
+  allergenes: Joi.string().optional(),
+});
+
+const updateMealSchema = Joi.object({
   name: Joi.string().required(),
   description: Joi.string().required(),
   isVega: Joi.number().optional(),
@@ -18,7 +31,7 @@ const schema = Joi.object({
 
 const mealController = {
   createMeal: (req, res) => {
-    const { error, value: input } = schema.validate(req.body);
+    const { error, value: input } = createMealSchema.validate(req.body);
 
     if (error) {
       logger.error(error);
@@ -98,6 +111,77 @@ const mealController = {
         );
       }
     });
+  },
+
+  updateMealById: (req, res) => {
+    const mealId = req.params.mealId;
+
+    const { error, value: input } = updateMealSchema.validate(req.body);
+
+    // Check for validation errors
+    if (error) {
+      return res.status(400).json({
+        status: 400,
+        message: "Invalid input",
+        error: error.details[0].message,
+      });
+    }
+
+    // Update the meal in the database
+    let updateMealSqlStatement = "UPDATE `meal` SET ? WHERE id = ?";
+
+    pool.query(
+      updateMealSqlStatement,
+      [input, mealId],
+      function (error, results, fields) {
+        if (error) {
+          logger.error(error);
+          return res.status(500).json({
+            status: 500,
+            message: "Failed to update meal",
+            data: {
+              error,
+            },
+          });
+        }
+
+        if (results.affectedRows === 0) {
+          return res.status(404).json({
+            status: 404,
+            message: `No meal with ID ${mealId}`,
+            data: {},
+          });
+        }
+
+        logger.info(`Updated meal by id: ${mealId}`);
+
+        let selectMealStatement = "SELECT * FROM `meal` WHERE id = ?";
+        pool.query(
+          selectMealStatement,
+          mealId,
+          function (error, results, fields) {
+            if (error) {
+              logger.error(error);
+              return res.status(500).json({
+                status: 500,
+                message: "Error retrieving updated meal information",
+                data: {
+                  error,
+                },
+              });
+            }
+
+            const updatedMeal = results[0];
+
+            res.status(200).json({
+              status: 200,
+              message: "Updated meal",
+              data: updatedMeal,
+            });
+          }
+        );
+      }
+    );
   },
 
   getAllMeals: (req, res) => {
