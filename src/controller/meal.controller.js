@@ -51,10 +51,10 @@ const mealController = {
     const newMeal = {
       name: input.name,
       description: input.description,
-      isActive: input.isActive,
-      isVega: input.isVega,
-      isVegan: input.isVegan,
-      isToTakeHome: input.isToTakeHome,
+      isActive: input.isActive || 1,
+      isVega: input.isVega || 0,
+      isVegan: input.isVegan || 0,
+      isToTakeHome: input.isToTakeHome || 0,
       dateTime: dateTime,
       maxAmountOfParticipants: input.maxAmountOfParticipants,
       price: input.price,
@@ -321,7 +321,7 @@ const mealController = {
 
     pool.query(
       deleteMealSqlStatement,
-      mealId,
+      [mealId],
       function (error, results, fields) {
         if (error) {
           logger.error(error);
@@ -335,7 +335,7 @@ const mealController = {
         } else if (results.affectedRows === 0) {
           res.status(404).json({
             status: 404,
-            message: `No meal with ID ${userId}`,
+            message: `No meal with ID ${mealId}`,
             data: {},
           });
         } else {
