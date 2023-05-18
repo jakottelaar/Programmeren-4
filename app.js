@@ -36,6 +36,9 @@ app.use("/api/login", loginRoutes);
 const mealRoutes = require("./src/routes/meal.routes");
 app.use("/api/meal", mealRoutes);
 
+const participateRoutes = require("./src/routes/participate.routes");
+app.use("/api/meal", participateRoutes);
+
 app.use("*", (req, res) => {
   logger.warn("Invalid endpoint called: ", req.path);
   res.status(404).json({
