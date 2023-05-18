@@ -7,4 +7,9 @@ participateRouter.post(
   participantController.signUpForAMeal
 );
 
+participateRouter.delete(
+  "/:mealId/participate",
+  participantController.cancelRegistrationForMeal
+);
+
 module.exports = participateRouter;
