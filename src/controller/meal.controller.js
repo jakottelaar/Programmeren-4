@@ -103,23 +103,104 @@ const mealController = {
   getAllMeals: (req, res) => {
     let sqlSelectStatement = "SELECT * FROM `meal`";
 
-    pool.query(sqlSelectStatement, function (error, results, fields) {
+    pool.query(sqlSelectStatement, function (error, mealResults, fields) {
       if (error) {
         logger.error(error);
-        res.status(500).json({
+        return res.status(500).json({
           status: 500,
           message: "Failed to fetch meals.",
           data: {
-            error,
+            error: error,
           },
         });
-      } else {
-        res.status(200).json({
-          status: 200,
-          message: "Meals fetched successfully.",
-          data: results,
-        });
       }
+
+      const cookId = mealResults[0].cookId;
+
+      let getCookInfoSqlStatement = "SELECT * FROM user WHERE id = ?";
+      pool.query(
+        getCookInfoSqlStatement,
+        cookId,
+        function (error, cookResults, fields) {
+          if (error) {
+            logger.error(error);
+            return res.status(500).json({
+              status: 500,
+              message: "Failed to fetch cook information",
+              data: {
+                error: error,
+              },
+            });
+          }
+
+          const cook = { ...cookResults[0] };
+          cook.isActive = cook.isActive === 1 ? true : false;
+          delete cook.password;
+
+          let getParticipantsSqlStatement = `
+          SELECT *
+          FROM meal_participants_user mp
+          INNER JOIN user u ON mp.userId = u.id
+          WHERE mp.mealId IN (?)`;
+
+          const mealIds = mealResults.map((meal) => meal.id);
+          pool.query(
+            getParticipantsSqlStatement,
+            [mealIds],
+            function (error, participantsResults, fields) {
+              if (error) {
+                logger.error(error);
+                return res.status(500).json({
+                  status: 500,
+                  message: "Failed to fetch participants.",
+                  data: {
+                    error: error,
+                  },
+                });
+              }
+
+              const participantsByMeal = participantsResults.reduce(
+                (acc, participant) => {
+                  const mealId = participant.mealId;
+                  if (!acc[mealId]) {
+                    acc[mealId] = [];
+                  }
+                  const convertedParticipant = {
+                    ...participant,
+                    isActive: participant.isActive === 1 ? true : false,
+                  };
+                  delete convertedParticipant.password;
+                  acc[mealId].push(convertedParticipant);
+                  return acc;
+                },
+                {}
+              );
+
+              const mealsWithParticipants = mealResults.map((meal) => {
+                const convertedMeal = {
+                  ...meal,
+                  isActive: meal.isActive === 1 ? true : false,
+                  isVega: meal.isVega === 1 ? true : false,
+                  isVegan: meal.isVegan === 1 ? true : false,
+                  isToTakeHome: meal.isToTakeHome === 1 ? true : false,
+                };
+
+                return {
+                  meal: convertedMeal,
+                  cook: cook,
+                  participants: participantsByMeal[meal.id] || [],
+                };
+              });
+
+              res.status(200).json({
+                status: 200,
+                message: "Successfully fetched all meals.",
+                data: mealsWithParticipants,
+              });
+            }
+          );
+        }
+      );
     });
   },
 
