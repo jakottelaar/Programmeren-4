@@ -14,18 +14,8 @@ app.use("*", (req, res, next) => {
   next();
 });
 
-app.get("/api/info", (req, res) => {
-  logger.info("Get server information");
-  res.status(200).json({
-    status: 200,
-    message: "Server info-endpoint",
-    data: {
-      studentName: "Jarno",
-      studentNumber: 2176550,
-      description: "Welkom bij de server API van de share a meal.",
-    },
-  });
-});
+const infoRoutes = require("./src/routes/info.routes");
+app.use("/api/info", infoRoutes);
 
 const userRoutes = require("./src/routes/user.routes");
 app.use("/api/user", userRoutes);
