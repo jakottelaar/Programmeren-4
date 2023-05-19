@@ -412,6 +412,32 @@ describe("UC-303 Opvragen van alle maaltijden", function () {
 });
 
 describe("UC-304 Verwijderen van maaltijde", function () {
+  it("TC-304-1 Maaltijd bestaat niet", (done) => {
+    const nonExistentMealId = mealId + 1; // ID of a non-existent meal
+
+    chai
+      .request(server)
+      .delete(`/api/meal/${nonExistentMealId}`)
+      .set("Authorization", `Bearer ${testToken}`)
+      .end((err, res) => {
+        if (err) {
+          logger.error(err);
+        } else {
+          logger.info(res.body);
+          expect(res).to.have.status(404);
+          expect(res.body).to.be.an("object");
+          expect(res.body).to.have.property("status").to.equal(404);
+          expect(res.body)
+            .to.have.property("message")
+            .to.equal(`No meal with ID ${nonExistentMealId}`);
+          expect(res.body).to.have.property("data").to.be.an("object").that.is
+            .empty;
+
+          done();
+        }
+      });
+  });
+
   it("TC-305-4 Maaltijd succesvol verwijderd", (done) => {
     chai
       .request(server)
