@@ -126,6 +126,7 @@ const mealController = {
 
   updateMealById: (req, res) => {
     const mealId = req.params.mealId;
+    const cookId = req.headers.cookId;
 
     const { error, value: input } = updateMealSchema.validate(req.body);
 
@@ -138,57 +139,85 @@ const mealController = {
       });
     }
 
-    // Update the meal in the database
-    let updateMealSqlStatement = "UPDATE `meal` SET ? WHERE id = ?";
-
+    // Check if the meal is connected to the cook ID
+    let selectMealSqlStatement =
+      "SELECT * FROM `meal` WHERE id = ? AND cookId = ?";
     pool.query(
-      updateMealSqlStatement,
-      [input, mealId],
+      selectMealSqlStatement,
+      [mealId, cookId],
       function (error, results, fields) {
         if (error) {
           logger.error(error);
           return res.status(500).json({
             status: 500,
-            message: "Failed to update meal",
+            message: "Error retrieving meal",
             data: {
               error,
             },
           });
         }
 
-        if (results.affectedRows === 0) {
-          return res.status(404).json({
-            status: 404,
-            message: `No meal with ID ${mealId}`,
+        if (results.length === 0) {
+          return res.status(403).json({
+            status: 403,
+            message: `Not authorized to update meal with ID ${mealId}`,
             data: {},
           });
         }
 
-        logger.info(`Updated meal by id: ${mealId}`);
+        // Update the meal in the database
+        let updateMealSqlStatement = "UPDATE `meal` SET ? WHERE id = ?";
 
-        let selectMealStatement = "SELECT * FROM `meal` WHERE id = ?";
         pool.query(
-          selectMealStatement,
-          mealId,
+          updateMealSqlStatement,
+          [input, mealId],
           function (error, results, fields) {
             if (error) {
               logger.error(error);
               return res.status(500).json({
                 status: 500,
-                message: "Error retrieving updated meal information",
+                message: "Failed to update meal",
                 data: {
                   error,
                 },
               });
             }
 
-            const updatedMeal = results[0];
+            if (results.affectedRows === 0) {
+              return res.status(404).json({
+                status: 404,
+                message: `No meal with ID ${mealId}`,
+                data: {},
+              });
+            }
 
-            res.status(200).json({
-              status: 200,
-              message: "Updated meal",
-              data: updatedMeal,
-            });
+            logger.info(`Updated meal by id: ${mealId}`);
+
+            let selectMealStatement = "SELECT * FROM `meal` WHERE id = ?";
+            pool.query(
+              selectMealStatement,
+              mealId,
+              function (error, results, fields) {
+                if (error) {
+                  logger.error(error);
+                  return res.status(500).json({
+                    status: 500,
+                    message: "Error retrieving updated meal information",
+                    data: {
+                      error,
+                    },
+                  });
+                }
+
+                const updatedMeal = results[0];
+
+                res.status(200).json({
+                  status: 200,
+                  message: "Updated meal",
+                  data: updatedMeal,
+                });
+              }
+            );
           }
         );
       }
