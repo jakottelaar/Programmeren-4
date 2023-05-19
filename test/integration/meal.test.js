@@ -351,6 +351,31 @@ describe("UC-302 Wijzigen van maaltijdsgegevens", function () {
         done();
       });
   });
+
+  it.only("TC-302-5 Maaltijd succesvol gewijzigd", (done) => {
+    const updatedMeal = {
+      name: "Updated Meal",
+      description: "A tasty and nutritious meal",
+      price: 10.99,
+      maxAmountOfParticipants: 20,
+      imageUrl: "https://example.com/meal-image.jpg",
+      allergenes: "gluten",
+    };
+
+    chai
+      .request(server)
+      .put(`/api/meal/${mealId}`)
+      .set("Authorization", `Bearer ${testToken}`)
+      .send(updatedMeal)
+      .end((err, res) => {
+        expect(res.body).to.be.an("object");
+        expect(res.body.status).to.equal(200);
+        expect(res.body.message).to.equal("Updated meal");
+        expect(res.body.data).to.be.an("object");
+
+        done();
+      });
+  });
 });
 
 describe("UC-304 Verwijderen van maaltijde", function () {
