@@ -10,13 +10,13 @@ const expect = chai.expect;
 
 describe("UC-201 Registreren als een nieuwe gebruiker", () => {
   it("TC-201-1 Verplicht veld ontbreekt", (done) => {
-    const requestBody = {
+    const newUser1 = {
       firstName: "",
-      lastName: "Testter",
+      lastName: "userTester",
       street: "123 Test St",
       isActive: true,
       city: "Test city",
-      emailAddress: "t.estman@mail.com",
+      emailAddress: "t.estmanUser@mail.com",
       password: "Password123",
       phoneNumber: "0612345678",
     };
@@ -24,7 +24,7 @@ describe("UC-201 Registreren als een nieuwe gebruiker", () => {
     chai
       .request(server)
       .post("/api/user")
-      .send(requestBody)
+      .send(newUser1)
       .end((err, res) => {
         console.log(res.body);
         expect(err).to.be.null;
@@ -41,9 +41,9 @@ describe("UC-201 Registreren als een nieuwe gebruiker", () => {
   });
 
   it("TC-201-2 Niet-valide emailadres", (done) => {
-    const newUser = {
-      firstName: "Test",
-      lastName: "Tester",
+    const newUser2 = {
+      firstName: "userTest",
+      lastName: "userTester",
       emailAddress: "invalidemail",
       isActive: true,
       password: "Password123",
@@ -55,7 +55,7 @@ describe("UC-201 Registreren als een nieuwe gebruiker", () => {
     chai
       .request(server)
       .post("/api/user")
-      .send(newUser)
+      .send(newUser2)
       .end((err, res) => {
         let { status, message } = res.body;
 
@@ -68,9 +68,9 @@ describe("UC-201 Registreren als een nieuwe gebruiker", () => {
   });
 
   it("TC-201-3 Niet-valide wachtwoord", (done) => {
-    const newUser = {
-      firstName: "Test",
-      lastName: "Tester",
+    const newUser3 = {
+      firstName: "userTest",
+      lastName: "userTester",
       emailAddress: "t.man@example.com",
       password: "password",
       street: "123 Main St",
@@ -81,7 +81,7 @@ describe("UC-201 Registreren als een nieuwe gebruiker", () => {
     chai
       .request(server)
       .post("/api/user")
-      .send(newUser)
+      .send(newUser3)
       .end((err, res) => {
         let { status, message } = res.body;
         expect(status).to.equal(400);
@@ -95,13 +95,13 @@ describe("UC-201 Registreren als een nieuwe gebruiker", () => {
   });
 
   it("TC-201-5 User succesvol geregistreer", (done) => {
-    const newUser = {
-      firstName: "Test",
-      lastName: "Testter",
+    const newUser5 = {
+      firstName: "userTest",
+      lastName: "userTester",
       street: "123 Test St",
       city: "Test city",
       isActive: true,
-      emailAddress: "t.estman@mail.com",
+      emailAddress: "t.estmanUser@mail.com",
       password: "Password123",
       phoneNumber: "0612345678",
     };
@@ -109,7 +109,7 @@ describe("UC-201 Registreren als een nieuwe gebruiker", () => {
     chai
       .request(server)
       .post("/api/user")
-      .send(newUser)
+      .send(newUser5)
       .end((err, res) => {
         expect(err).to.be.null;
 
@@ -132,12 +132,12 @@ describe("UC-201 Registreren als een nieuwe gebruiker", () => {
 
   it("TC-201-4 gebruiker bestaat al", (done) => {
     const existingUser = {
-      firstName: "Test",
-      lastName: "Testter",
+      firstName: "userTest",
+      lastName: "userTester",
       street: "123 Test St",
       city: "Test city",
       isActive: true,
-      emailAddress: "t.estman@mail.com",
+      emailAddress: "t.estmanUser@mail.com",
       password: "Password123",
       phoneNumber: "0612345678",
     };
@@ -169,7 +169,6 @@ describe("UC-202 Opvragen van overzicht van users", () => {
       .end((err, res) => {
         expect(err).to.be.null;
 
-        console.log(res.body);
         expect(res.body).to.be.an("object");
         let { status, message, data } = res.body;
 
@@ -201,7 +200,6 @@ describe("UC-202 Opvragen van overzicht van users", () => {
       .end((err, res) => {
         expect(err).to.be.null;
 
-        console.log(res.body);
         expect(res.body).to.be.an("object");
         let { status, message, data } = res.body;
 
@@ -227,7 +225,6 @@ describe("UC-202 Opvragen van overzicht van users", () => {
         .end((err, res) => {
           expect(err).to.be.null;
 
-          console.log(res.body);
           expect(res.body).to.be.an("object");
           let { status, message, data } = res.body;
 
@@ -313,7 +310,7 @@ describe("UC-203 Opvragen van gebruikersprofiel", () => {
     chai
       .request(server)
       .post("/api/login")
-      .send({ emailAddress: "t.estman@mail.com", password: "Password123" })
+      .send({ emailAddress: "t.estmanUser@mail.com", password: "Password123" })
       .end((loginErr, loginRes) => {
         token = loginRes.body.data.token;
         logger.info(`Token created: ${token}`);
@@ -385,8 +382,8 @@ describe("UC-204 Opvragen van usergegevens bij ID", () => {
 describe("UC-205 Gebruiker wijzingen", () => {
   it("TC-205-1 Verplicht veld 'emailAddress' ontbreekt", (done) => {
     const newUser = {
-      firstName: "Test",
-      lastName: "Testter",
+      firstName: "userTest",
+      lastName: "userTester",
       street: "123 Test St",
       city: "Test city",
       password: "Password123",
@@ -418,9 +415,9 @@ describe("UC-205 Gebruiker wijzingen", () => {
       .put(`/api/user/${userId}`)
       .set("Authorization", `Bearer ${token}`)
       .send({
-        firstName: "Test",
-        lastName: "Testter",
-        emailAddress: "t.estman@mail.com",
+        firstName: "userTest",
+        lastName: "userTester",
+        emailAddress: "t.estmanUser@mail.com",
         street: "123 Test St",
         city: "Test city",
         password: "Password123",
@@ -449,9 +446,9 @@ describe("UC-205 Gebruiker wijzingen", () => {
       .put(`/api/user/${nonExistentUserId}`)
       .set("Authorization", `Bearer ${token}`)
       .send({
-        firstName: "Test",
+        firstName: "userTest",
         lastName: "Tester",
-        emailAddress: "t.estman@mail.com",
+        emailAddress: "t.estmanUser@mail.com",
         password: "Password123",
         street: "123 Main St",
         city: "Anytown",

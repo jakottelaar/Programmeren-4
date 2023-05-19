@@ -16,9 +16,9 @@ const expect = chai.expect;
 describe("UC-301 Toevoegen van maaltijd", function () {
   before((done) => {
     const testUser1 = {
-      firstName: "Test",
-      lastName: "Tester",
-      emailAddress: "t.estman@mail.com",
+      firstName: "mealTest",
+      lastName: "mealTester",
+      emailAddress: "t.estmanMeal@mail.com",
       password: "Password123",
       street: "123 Main St",
       city: "Anytown",
@@ -40,7 +40,7 @@ describe("UC-301 Toevoegen van maaltijd", function () {
             .request(server)
             .post("/api/login")
             .send({
-              emailAddress: "t.estman@mail.com",
+              emailAddress: "t.estmanMeal@mail.com",
               password: "Password123",
             })
             .end((loginErr, loginRes) => {
@@ -56,9 +56,9 @@ describe("UC-301 Toevoegen van maaltijd", function () {
       });
 
     const testUser2 = {
-      firstName: "Test2",
-      lastName: "Tester2",
-      emailAddress: "t.estman2@mail.com",
+      firstName: "mealTest2",
+      lastName: "mealTester2",
+      emailAddress: "t.estmanMeal2@mail.com",
       password: "Password123",
       street: "123 Main St",
       city: "Anytown",
@@ -80,7 +80,7 @@ describe("UC-301 Toevoegen van maaltijd", function () {
             .request(server)
             .post("/api/login")
             .send({
-              emailAddress: "t.estman2@mail.com",
+              emailAddress: "t.estmanMeal2@mail.com",
               password: "Password123",
             })
             .end((loginErr, loginRes) => {
@@ -379,7 +379,7 @@ describe("UC-302 Wijzigen van maaltijdsgegevens", function () {
 });
 
 describe("UC-303 Opvragen van alle maaltijden", function () {
-  it.only("TC-303-1 Lijst van maaltijden geretourneerd", (done) => {
+  it("TC-303-1 Lijst van maaltijden geretourneerd", (done) => {
     chai
       .request(server)
       .get("/api/meal")
