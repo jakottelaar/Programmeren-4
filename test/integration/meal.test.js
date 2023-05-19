@@ -184,7 +184,6 @@ describe("UC-301 Toevoegen van maaltijd", function () {
 
 describe("UC-302 Wijzigen van maaltijdsgegevens", function () {
   it.only("TC-302-1 Verplicht velden 'name' en/of 'price' en/of 'maxAmountOfParticipants' ontbreken", (done) => {
-    const mealId = 58;
     const updatedMeal = {
       description: "Updated meal description",
       price: 10.99,
@@ -214,6 +213,36 @@ describe("UC-302 Wijzigen van maaltijdsgegevens", function () {
           expect(res.body.data)
             .to.have.property("error")
             .to.equal("Name is a required field");
+          done();
+        }
+      });
+  });
+
+  it.only("TC-302-2 Niet ingelogd", (done) => {
+    const updatedMeal = {
+      name: "Delicious Meal",
+      description: "Updated meal description",
+      price: 10.99,
+      maxAmountOfParticipants: 20,
+      imageUrl: "https://example.com/meal-image.jpg",
+      allergenes: "gluten",
+    };
+    chai
+      .request(server)
+      .put(`/api/meal/${mealId}`)
+      .send(updatedMeal)
+      .end((err, res) => {
+        if (err) {
+          logger.error(err);
+          done();
+        } else {
+          logger.info(res.body);
+          expect(res.body).to.be.an("object");
+          expect(res.body).to.have.property("status").to.equal(401);
+          expect(res.body)
+            .to.have.property("message")
+            .to.equal("Unauthorized: Missing or invalid token");
+          expect(res.body).to.have.property("data").to.be.empty;
           done();
         }
       });
