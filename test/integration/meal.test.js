@@ -436,7 +436,9 @@ describe("UC-304 Verwijderen van maaltijde", function () {
         }
       });
   });
+});
 
+describe("UC-305 Verwijderen van maaltijd", function () {
   it("TC-305-4 Maaltijd succesvol verwijderd", (done) => {
     chai
       .request(server)
