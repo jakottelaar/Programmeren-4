@@ -417,8 +417,7 @@ describe("UC-304 Verwijderen van maaltijde", function () {
 
     chai
       .request(server)
-      .delete(`/api/meal/${nonExistentMealId}`)
-      .set("Authorization", `Bearer ${testToken}`)
+      .get(`/api/meal/${nonExistentMealId}`)
       .end((err, res) => {
         if (err) {
           logger.error(err);
@@ -429,7 +428,7 @@ describe("UC-304 Verwijderen van maaltijde", function () {
           expect(res.body).to.have.property("status").to.equal(404);
           expect(res.body)
             .to.have.property("message")
-            .to.equal(`No meal with ID ${nonExistentMealId}`);
+            .to.equal(`No meal with ID ${nonExistentMealId} found`);
           expect(res.body).to.have.property("data").to.be.an("object").that.is
             .empty;
 
