@@ -35,19 +35,6 @@ describe("UC-301 Toevoegen van maaltijd", function () {
       });
   });
 
-  // Delete the user after the test case
-  after((done) => {
-    chai
-      .request(server)
-      .delete(`/api/user/${userId}`)
-      .end((err, res) => {
-        if (err) {
-          logger.error(err);
-        }
-        done();
-      });
-  });
-
   it.only("TC-301-1 Verplicht veld ontbreekt", (done) => {
     const mealData = {
       // Missing required field(s)
@@ -141,7 +128,9 @@ describe("UC-301 Toevoegen van maaltijd", function () {
         }
       });
   });
+});
 
+describe("UC-301 Toevoegen van maaltijd", function () {
   it.only("TC-305-4 Maaltijd succesvol verwijderd", (done) => {
     chai
       .request(server)
@@ -165,6 +154,17 @@ describe("UC-301 Toevoegen van maaltijd", function () {
 
           done();
         }
+      });
+  });
+  after((done) => {
+    chai
+      .request(server)
+      .delete(`/api/user/${userId}`)
+      .end((err, res) => {
+        if (err) {
+          logger.error(err);
+        }
+        done();
       });
   });
 });
