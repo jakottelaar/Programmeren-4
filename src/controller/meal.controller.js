@@ -140,11 +140,11 @@ const mealController = {
     }
 
     // Check if the meal is connected to the cook ID
-    let selectMealSqlStatement =
-      "SELECT * FROM `meal` WHERE id = ? AND cookId = ?";
+    let selectMealSqlStatement = "SELECT * FROM `meal` WHERE id = ?";
+
     pool.query(
       selectMealSqlStatement,
-      [mealId, cookId],
+      [mealId],
       function (error, results, fields) {
         if (error) {
           logger.error(error);
@@ -158,6 +158,17 @@ const mealController = {
         }
 
         if (results.length === 0) {
+          return res.status(404).json({
+            status: 404,
+            message: `No meal with ID ${mealId} found`,
+            data: {},
+          });
+        }
+
+        const meal = results[0];
+
+        // Check if the user calling the endpoint is the cook
+        if (meal.cookId !== cookId) {
           return res.status(403).json({
             status: 403,
             message: `Not authorized to update meal with ID ${mealId}`,
