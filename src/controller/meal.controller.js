@@ -357,11 +357,19 @@ const mealController = {
           },
         });
       } else {
-        res.status(200).json({
-          status: 200,
-          message: `Meal fetched by id`,
-          data: results,
-        });
+        if (results.length === 0) {
+          return res.status(404).json({
+            status: 404,
+            message: `No meal with ID ${mealId} found`,
+            data: {},
+          });
+        } else {
+          res.status(200).json({
+            status: 200,
+            message: `Meal fetched by id`,
+            data: results,
+          });
+        }
       }
     });
   },
