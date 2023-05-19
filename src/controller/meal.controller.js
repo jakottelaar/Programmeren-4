@@ -126,7 +126,9 @@ const mealController = {
 
   updateMealById: (req, res) => {
     const mealId = req.params.mealId;
-    const cookId = req.headers.cookId;
+    const cookId = req.userId;
+
+    logger.info(cookId);
 
     const { error, value: input } = updateMealSchema.validate(req.body);
 
