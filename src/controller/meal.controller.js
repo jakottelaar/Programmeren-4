@@ -17,14 +17,20 @@ const createMealSchema = Joi.object({
 });
 
 const updateMealSchema = Joi.object({
-  name: Joi.string().required(),
+  name: Joi.string().required().messages({
+    "any.required": "Name is a required field",
+  }),
   description: Joi.string().required(),
   isVega: Joi.number().optional(),
   isVegan: Joi.number().optional(),
   isToTakeHome: Joi.number().optional(),
   isActive: Joi.number().optional(),
-  price: Joi.number().required(),
-  maxAmountOfParticipants: Joi.number().required(),
+  price: Joi.number().required().messages({
+    "any.required": "Name is a required field",
+  }),
+  maxAmountOfParticipants: Joi.number().messages({
+    "any.required": "Max amount of participants is a required field",
+  }),
   imageUrl: Joi.string().required(),
   allergenes: Joi.string().optional(),
 });
@@ -128,7 +134,7 @@ const mealController = {
       return res.status(400).json({
         status: 400,
         message: "Invalid input",
-        error: error.details[0].message,
+        data: { error: error.details[0].message },
       });
     }
 
