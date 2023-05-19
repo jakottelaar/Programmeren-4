@@ -132,6 +132,8 @@ module.exports = {
 
       req.userId = decoded.userId;
 
+      logger.info(req.userId);
+
       next();
     } catch (err) {
       return res.status(401).json({
