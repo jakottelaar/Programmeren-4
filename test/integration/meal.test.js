@@ -7,12 +7,15 @@ let mealId = 0;
 let testToken = 0;
 let testUserId = 0;
 
+let test2Token = 0;
+let testUserId2 = 0;
+
 chai.use(chaiHttp);
 const expect = chai.expect;
 
 describe("UC-301 Toevoegen van maaltijd", function () {
   before((done) => {
-    const userData = {
+    const testUser1 = {
       firstName: "Test",
       lastName: "Tester",
       emailAddress: "t.estman@mail.com",
@@ -25,7 +28,7 @@ describe("UC-301 Toevoegen van maaltijd", function () {
     chai
       .request(server)
       .post("/api/user")
-      .send(userData)
+      .send(testUser1)
       .end((err, res) => {
         if (err) {
           logger.error(err);
@@ -47,6 +50,46 @@ describe("UC-301 Toevoegen van maaltijd", function () {
               } else {
                 testToken = loginRes.body.data.token;
                 logger.info(`Token created: ${testToken}`);
+              }
+            });
+        }
+      });
+
+    const testUser2 = {
+      firstName: "Test2",
+      lastName: "Tester2",
+      emailAddress: "t.estman2@mail.com",
+      password: "Password123",
+      street: "123 Main St",
+      city: "Anytown",
+      phoneNumber: "0612345678",
+    };
+
+    chai
+      .request(server)
+      .post("/api/user")
+      .send(testUser2)
+      .end((err, res) => {
+        if (err) {
+          logger.error(err);
+          done(err);
+        } else {
+          testUserId2 = res.body.data.id;
+
+          chai
+            .request(server)
+            .post("/api/login")
+            .send({
+              emailAddress: "t.estman2@mail.com",
+              password: "Password123",
+            })
+            .end((loginErr, loginRes) => {
+              if (loginErr) {
+                logger.error(loginErr);
+                done(loginErr);
+              } else {
+                testToken2 = loginRes.body.data.token;
+                logger.info(`Token created: ${testToken2}`);
                 done();
               }
             });
@@ -258,12 +301,10 @@ describe("UC-302 Wijzigen van maaltijdsgegevens", function () {
       allergenes: "gluten",
     };
 
-    const invalidMealId = mealId + 1;
-
     chai
       .request(server)
-      .put(`/api/meal/${invalidMealId}`)
-      .set("Authorization", `Bearer ${testToken}`)
+      .put(`/api/meal/${mealId}`)
+      .set("Authorization", `Bearer ${testToken2}`)
       .send(mealData)
       .end((err, res) => {
         if (err) {
@@ -276,9 +317,38 @@ describe("UC-302 Wijzigen van maaltijdsgegevens", function () {
           expect(res.body).to.have.property("status").to.equal(403);
           expect(res.body)
             .to.have.property("message")
-            .to.equal(`Not authorized to update meal with ID ${invalidMealId}`);
+            .to.equal(`Not authorized to update meal with ID ${mealId}`);
           done();
         }
+      });
+  });
+
+  it.only("TC-302-4 Maaltijd bestaat niet", (done) => {
+    const nonExistentMealId = mealId + 1; // ID of a non-existent meal
+
+    const mealData = {
+      name: "Delicious Meal",
+      description: "A tasty and nutritious meal",
+      price: 10.99,
+      maxAmountOfParticipants: 20,
+      imageUrl: "https://example.com/meal-image.jpg",
+      allergenes: "gluten",
+    };
+
+    chai
+      .request(server)
+      .put(`/api/meal/${nonExistentMealId}`)
+      .set("Authorization", `Bearer ${testToken}`)
+      .send(mealData)
+      .end((err, res) => {
+        expect(res.body).to.be.an("object");
+        expect(res.body.status).to.equal(404);
+        expect(res.body.message).to.equal(
+          `No meal with ID ${nonExistentMealId} found`
+        );
+        expect(res.body.data).to.be.an("object").that.is.empty;
+
+        done();
       });
   });
 });
@@ -316,6 +386,15 @@ after((done) => {
   chai
     .request(server)
     .delete(`/api/user/${testUserId}`)
+    .end((err, res) => {
+      if (err) {
+        logger.error(err);
+      }
+    });
+
+  chai
+    .request(server)
+    .delete(`/api/user/${testUserId2}`)
     .end((err, res) => {
       if (err) {
         logger.error(err);
