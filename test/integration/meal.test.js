@@ -54,7 +54,7 @@ describe("UC-301 Toevoegen van maaltijd", function () {
       });
   });
 
-  it.only("TC-301-1 Verplicht veld ontbreekt", (done) => {
+  it("TC-301-1 Verplicht veld ontbreekt", (done) => {
     const mealData = {
       // Missing required field(s)
       // Add other necessary fields as needed
@@ -93,7 +93,38 @@ describe("UC-301 Toevoegen van maaltijd", function () {
       });
   });
 
-  it.only("TC-301-3 Maaltijd succesvol toegevoegd", (done) => {
+  it.only("TC-301-2 Niet ingelogd", (done) => {
+    const mealData = {
+      name: "Delicious Meal",
+      description: "A tasty and nutritious meal",
+      price: 10.99,
+      maxAmountOfParticipants: 20,
+      imageUrl: "https://example.com/meal-image.jpg",
+      allergenes: "gluten",
+    };
+    chai
+      .request(server)
+      .post("/api/meal")
+      .send(mealData)
+      .end((err, res) => {
+        if (err) {
+          logger.error(err);
+          done();
+        } else {
+          logger.info(res.body);
+          expect(res.body).to.be.an("object");
+          expect(res.body).to.have.property("status").to.equal(401);
+          expect(res.body)
+            .to.have.property("message")
+            .to.equal("Unauthorized: Missing or invalid token");
+          expect(res.body).to.have.property("data").to.be.empty;
+
+          done();
+        }
+      });
+  });
+
+  it("TC-301-3 Maaltijd succesvol toegevoegd", (done) => {
     const meal = {
       name: "Delicious Meal",
       description: "A tasty and nutritious meal",
@@ -152,7 +183,7 @@ describe("UC-301 Toevoegen van maaltijd", function () {
 });
 
 describe("UC-304 Verwijderen van maaltijde", function () {
-  it.only("TC-305-4 Maaltijd succesvol verwijderd", (done) => {
+  it("TC-305-4 Maaltijd succesvol verwijderd", (done) => {
     chai
       .request(server)
       .delete(`/api/meal/${mealId}`)

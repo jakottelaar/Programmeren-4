@@ -121,7 +121,7 @@ module.exports = {
       return res.status(401).json({
         status: 401,
         message: "Unauthorized: Missing or invalid token",
-        data: undefined,
+        data: {},
       });
     }
 
@@ -137,7 +137,7 @@ module.exports = {
       return res.status(401).json({
         status: 401,
         message: "Unauthorized: Invalid token",
-        data: undefined,
+        data: {},
       });
     }
   },
