@@ -93,7 +93,7 @@ describe("UC-301 Toevoegen van maaltijd", function () {
       });
   });
 
-  it.only("TC-301-2 Niet ingelogd", (done) => {
+  it("TC-301-2 Niet ingelogd", (done) => {
     const mealData = {
       name: "Delicious Meal",
       description: "A tasty and nutritious meal",
@@ -124,7 +124,7 @@ describe("UC-301 Toevoegen van maaltijd", function () {
       });
   });
 
-  it("TC-301-3 Maaltijd succesvol toegevoegd", (done) => {
+  it.only("TC-301-3 Maaltijd succesvol toegevoegd", (done) => {
     const meal = {
       name: "Delicious Meal",
       description: "A tasty and nutritious meal",
@@ -182,8 +182,46 @@ describe("UC-301 Toevoegen van maaltijd", function () {
   });
 });
 
+describe("UC-302 Wijzigen van maaltijdsgegevens", function () {
+  it.only("TC-302-1 Verplicht velden 'name' en/of 'price' en/of 'maxAmountOfParticipants' ontbreken", (done) => {
+    const mealId = 58;
+    const updatedMeal = {
+      description: "Updated meal description",
+      price: 10.99,
+      maxAmountOfParticipants: 20,
+      imageUrl: "https://example.com/meal-image.jpg",
+      allergenes: "gluten",
+    };
+
+    chai
+      .request(server)
+      .put(`/api/meal/${mealId}`)
+      .set("Authorization", `Bearer ${testToken}`)
+      .send(updatedMeal)
+      .end((err, res) => {
+        if (err) {
+          logger.error(err);
+          done();
+        } else {
+          logger.info(res.body);
+          expect(res).to.have.status(400);
+          expect(res.body).to.be.an("object");
+          expect(res.body).to.have.property("status").to.equal(400);
+          expect(res.body)
+            .to.have.property("message")
+            .to.equal("Invalid input");
+          expect(res.body).to.have.property("data");
+          expect(res.body.data)
+            .to.have.property("error")
+            .to.equal("Name is a required field");
+          done();
+        }
+      });
+  });
+});
+
 describe("UC-304 Verwijderen van maaltijde", function () {
-  it("TC-305-4 Maaltijd succesvol verwijderd", (done) => {
+  it.only("TC-305-4 Maaltijd succesvol verwijderd", (done) => {
     chai
       .request(server)
       .delete(`/api/meal/${mealId}`)
