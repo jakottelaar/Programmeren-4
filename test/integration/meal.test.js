@@ -247,6 +247,40 @@ describe("UC-302 Wijzigen van maaltijdsgegevens", function () {
         }
       });
   });
+
+  it.only("TC-302-3 Niet de eigenaar van de data", (done) => {
+    const mealData = {
+      name: "Delicious Meal",
+      description: "A tasty and nutritious meal",
+      price: 10.99,
+      maxAmountOfParticipants: 20,
+      imageUrl: "https://example.com/meal-image.jpg",
+      allergenes: "gluten",
+    };
+
+    const invalidMealId = mealId + 1;
+
+    chai
+      .request(server)
+      .put(`/api/meal/${invalidMealId}`)
+      .set("Authorization", `Bearer ${testToken}`)
+      .send(mealData)
+      .end((err, res) => {
+        if (err) {
+          logger.error(err);
+          done();
+        } else {
+          logger.info(res.body);
+          expect(res).to.have.status(403);
+          expect(res.body).to.be.an("object");
+          expect(res.body).to.have.property("status").to.equal(403);
+          expect(res.body)
+            .to.have.property("message")
+            .to.equal(`Not authorized to update meal with ID ${invalidMealId}`);
+          done();
+        }
+      });
+  });
 });
 
 describe("UC-304 Verwijderen van maaltijde", function () {
