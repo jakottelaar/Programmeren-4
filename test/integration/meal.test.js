@@ -4,6 +4,8 @@ const server = require("../../app");
 const { logger } = require("../../src/util/utils");
 
 let mealId = 0;
+let testToken = 0;
+let testUserId = 0;
 
 chai.use(chaiHttp);
 const expect = chai.expect;
@@ -27,10 +29,27 @@ describe("UC-301 Toevoegen van maaltijd", function () {
       .end((err, res) => {
         if (err) {
           logger.error(err);
-          done();
+          done(err);
         } else {
-          userId = res.body.data.id; // Store the created user's ID for later use
-          done();
+          testUserId = res.body.data.id;
+
+          chai
+            .request(server)
+            .post("/api/login")
+            .send({
+              emailAddress: "t.estman@mail.com",
+              password: "Password123",
+            })
+            .end((loginErr, loginRes) => {
+              if (loginErr) {
+                logger.error(loginErr);
+                done(loginErr);
+              } else {
+                testToken = loginRes.body.data.token;
+                logger.info(`Token created: ${testToken}`);
+                done();
+              }
+            });
         }
       });
   });
@@ -49,7 +68,8 @@ describe("UC-301 Toevoegen van maaltijd", function () {
     chai
       .request(server)
       .post("/api/meal")
-      .set("userid", userId)
+      .set("userid", testUserId)
+      .set("Authorization", `Bearer ${testToken}`)
       .send(mealData)
       .end((err, res) => {
         if (err) {
@@ -86,7 +106,8 @@ describe("UC-301 Toevoegen van maaltijd", function () {
     chai
       .request(server)
       .post("/api/meal")
-      .set("userid", userId)
+      .set("userid", testUserId)
+      .set("Authorization", `Bearer ${testToken}`)
       .send(meal)
       .end((err, res) => {
         if (err) {
@@ -113,7 +134,7 @@ describe("UC-301 Toevoegen van maaltijd", function () {
           expect(data)
             .to.have.property("imageUrl")
             .to.equal("https://example.com/meal-image.jpg");
-          expect(data).to.have.property("cookId").to.equal(userId); // Assuming userId is the ID of the cook
+          expect(data).to.have.property("cookId").to.equal(testUserId); // AssumingtestUserId is the ID of the cook
           expect(data).to.have.property("createDate");
           expect(data).to.have.property("updateDate");
           expect(data).to.have.property("name").to.equal("Delicious Meal");
@@ -130,11 +151,12 @@ describe("UC-301 Toevoegen van maaltijd", function () {
   });
 });
 
-describe("UC-301 Toevoegen van maaltijd", function () {
+describe("UC-304 Verwijderen van maaltijde", function () {
   it.only("TC-305-4 Maaltijd succesvol verwijderd", (done) => {
     chai
       .request(server)
       .delete(`/api/meal/${mealId}`)
+      .set("Authorization", `Bearer ${testToken}`)
       .end((err, res) => {
         if (err) {
           logger.error(err);
@@ -156,15 +178,16 @@ describe("UC-301 Toevoegen van maaltijd", function () {
         }
       });
   });
-  after((done) => {
-    chai
-      .request(server)
-      .delete(`/api/user/${userId}`)
-      .end((err, res) => {
-        if (err) {
-          logger.error(err);
-        }
-        done();
-      });
-  });
+});
+
+after((done) => {
+  chai
+    .request(server)
+    .delete(`/api/user/${testUserId}`)
+    .end((err, res) => {
+      if (err) {
+        logger.error(err);
+      }
+      done();
+    });
 });
