@@ -98,13 +98,18 @@ const mealController = {
               logger.info(
                 `Inserted new meal with id: ${createdMealId} and cookId ${userId}`
               );
-              results[0].isActive == true
-                ? (results[0].isActive = true)
-                : (results[0].isActive = false);
+
+              const convertedMeal = {
+                ...createdMeal,
+                isActive: createdMeal.isActive === 1 ? true : false,
+                isVega: createdMeal.isVega === 1 ? true : false,
+                isVegan: createdMeal.isVegan === 1 ? true : false,
+                isToTakeHome: createdMeal.isToTakeHome === 1 ? true : false,
+              };
               res.status(201).json({
                 status: 201,
                 message: "Meal created successfully",
-                data: createdMeal,
+                data: convertedMeal,
               });
             }
           }
