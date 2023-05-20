@@ -15,6 +15,7 @@ jobs:
       MYSQL_DATABASE: shareameal
       MYSQL_USER: root
       MYSQL_PASSWORD: root
+      JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
     services:
       mysql:
         image: mysql:5.7
@@ -58,4 +59,3 @@ jobs:
         run: railway up
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-          JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
