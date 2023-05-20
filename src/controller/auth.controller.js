@@ -130,9 +130,9 @@ module.exports = {
     try {
       const decoded = jwt.verify(token, jwtSecretKey);
 
-      req.userId = decoded.userId;
+      req.userid = decoded.userId;
 
-      logger.info(req.userId);
+      logger.info(req.userid);
 
       next();
     } catch (err) {
