@@ -411,7 +411,7 @@ describe("UC-303 Opvragen van alle maaltijden", function () {
   });
 });
 
-describe("UC-304 Verwijderen van maaltijde", function () {
+describe("UC-304 Opvragen van maaltijd bij ID", function () {
   it.only("TC-304-1 Maaltijd bestaat niet", (done) => {
     const nonExistentMealId = mealId + 1; // ID of a non-existent meal
 
@@ -485,6 +485,27 @@ describe("UC-305 Verwijderen van maaltijd", function () {
           expect(res.body).to.deep.equal({
             status: 401,
             message: "Unauthorized: Missing or invalid token",
+            data: {},
+          });
+          done();
+        }
+      });
+  });
+
+  it.only("TC-305-2 Niet de eigenaar van de data", (done) => {
+    chai
+      .request(server)
+      .delete(`/api/meal/${mealId}`)
+      .set("Authorization", `Bearer ${testToken2}`)
+      .end((err, res) => {
+        if (err) {
+          logger.error(err);
+        } else {
+          logger.info(res.body);
+          expect(res).to.have.status(403);
+          expect(res.body).to.deep.equal({
+            status: 403,
+            message: `Not authorized to delete meal with ID ${mealId}`,
             data: {},
           });
           done();

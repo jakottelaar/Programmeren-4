@@ -473,7 +473,7 @@ const mealController = {
           // Handle 403 response here
           return res.status(403).json({
             status: 403,
-            message: `Not authorized to update meal with ID ${mealId}`,
+            message: `Not authorized to delete meal with ID ${mealId}`,
             data: {},
           });
         } else {
