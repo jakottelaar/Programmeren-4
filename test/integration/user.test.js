@@ -234,7 +234,7 @@ describe("UC-202 Opvragen van overzicht van users", () => {
             .to.be.an("array")
             .and.to.satisfy((users) => {
               return users.every((user) => {
-                return user.isActive === 0;
+                return user.isActive === false;
               });
             });
 
@@ -265,7 +265,7 @@ describe("UC-202 Opvragen van overzicht van users", () => {
           .to.be.an("array")
           .and.to.satisfy((users) => {
             return users.every((user) => {
-              return user.isActive === 1;
+              return user.isActive === true;
             });
           });
 
@@ -318,7 +318,7 @@ describe("UC-203 Opvragen van gebruikersprofiel", () => {
       });
   });
 
-  it("TC-203-2 Gebruiker is ingelogd met geldig token. (Niet getest op een token, er wordt alleen een fictief profiel geretouneerd)", (done) => {
+  it("TC-203-2 Gebruiker is ingelogd met geldig token", (done) => {
     chai
       .request(server)
       .get("/api/user/profile")
@@ -326,14 +326,12 @@ describe("UC-203 Opvragen van gebruikersprofiel", () => {
       .end((err, res) => {
         expect(err).to.be.null;
 
-        console.log(res.body);
+        expect(res).to.have.status(200);
         expect(res.body).to.be.an("object");
-        let { status, message, user } = res.body;
+        let { status, message, data } = res.body;
         expect(status).to.equal(200);
-        expect(message).to.equal(
-          "GET Request for profile info is not yet implemented!"
-        );
-        expect(user).to.be.an("null");
+        expect(message).to.equal("User profile retrieved successfully");
+        expect(data).to.be.an("object");
 
         done();
       });
@@ -372,7 +370,7 @@ describe("UC-204 Opvragen van usergegevens bij ID", () => {
 
         expect(status).to.equal(200);
         expect(message).to.equal("User retrieved by id successfully.");
-        expect(data).to.be.an("array");
+        expect(data).to.be.an("object");
 
         done();
       });
