@@ -346,32 +346,104 @@ const mealController = {
 
     const mealId = parseInt(req.params.mealId);
 
-    pool.query(sqlSelectStatement, mealId, function (error, results, fields) {
-      if (error) {
-        logger.error(error);
-        res.status(500).json({
-          status: 500,
-          message: "Failed to fetch meal by id",
-          data: {
-            error,
-          },
-        });
-      } else {
-        if (results.length === 0) {
-          return res.status(404).json({
-            status: 404,
-            message: `No meal with ID ${mealId} found`,
-            data: {},
+    pool.query(
+      sqlSelectStatement,
+      mealId,
+      function (error, mealResults, fields) {
+        if (error) {
+          logger.error(error);
+          res.status(500).json({
+            status: 500,
+            message: "Failed to fetch meal by id",
+            data: {
+              error,
+            },
           });
         } else {
-          res.status(200).json({
-            status: 200,
-            message: `Meal fetched by id`,
-            data: results,
-          });
+          if (mealResults.length === 0) {
+            return res.status(404).json({
+              status: 404,
+              message: `No meal with ID ${mealId} found`,
+              data: {},
+            });
+          } else {
+            const meal = { ...mealResults[0] };
+            meal.isActive = meal.isActive === 1 ? true : false;
+            meal.isVega = meal.isVega === 1 ? true : false;
+            meal.isVegan = meal.isVegan === 1 ? true : false;
+            meal.isToTakeHome = meal.isToTakeHome === 1 ? true : false;
+
+            const cookId = meal.cookId;
+
+            let getCookInfoSqlStatement = "SELECT * FROM user WHERE id = ?";
+            pool.query(
+              getCookInfoSqlStatement,
+              cookId,
+              function (error, cookResults, fields) {
+                if (error) {
+                  logger.error(error);
+                  return res.status(500).json({
+                    status: 500,
+                    message: "Failed to fetch cook information",
+                    data: {
+                      error: error,
+                    },
+                  });
+                }
+
+                const cook = { ...cookResults[0] };
+                cook.isActive = cook.isActive === 1 ? true : false;
+                delete cook.password;
+
+                let getParticipantsSqlStatement = `
+            SELECT *
+            FROM meal_participants_user mp
+            INNER JOIN user u ON mp.userId = u.id
+            WHERE mp.mealId = ?`;
+
+                pool.query(
+                  getParticipantsSqlStatement,
+                  mealId,
+                  function (error, participantsResults, fields) {
+                    if (error) {
+                      logger.error(error);
+                      return res.status(500).json({
+                        status: 500,
+                        message: "Failed to fetch participants.",
+                        data: {
+                          error: error,
+                        },
+                      });
+                    }
+
+                    const participants = participantsResults.map(
+                      (participant) => {
+                        const convertedParticipant = {
+                          ...participant,
+                          isActive: participant.isActive === 1 ? true : false,
+                        };
+                        delete convertedParticipant.password;
+                        return convertedParticipant;
+                      }
+                    );
+
+                    res.status(200).json({
+                      status: 200,
+                      message: "Meal details retrieved successfully",
+                      data: {
+                        meal: meal,
+                        cook: cook,
+                        participants: participants,
+                      },
+                    });
+                  }
+                );
+              }
+            );
+          }
         }
       }
-    });
+    );
   },
 
   deleteMealById: (req, res) => {

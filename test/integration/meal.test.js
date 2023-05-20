@@ -97,7 +97,7 @@ describe("UC-301 Toevoegen van maaltijd", function () {
       });
   });
 
-  it("TC-301-1 Verplicht veld ontbreekt", (done) => {
+  it.only("TC-301-1 Verplicht veld ontbreekt", (done) => {
     const mealData = {
       // Missing required field(s)
       // Add other necessary fields as needed
@@ -136,7 +136,7 @@ describe("UC-301 Toevoegen van maaltijd", function () {
       });
   });
 
-  it("TC-301-2 Niet ingelogd", (done) => {
+  it.only("TC-301-2 Niet ingelogd", (done) => {
     const mealData = {
       name: "Delicious Meal",
       description: "A tasty and nutritious meal",
@@ -167,7 +167,7 @@ describe("UC-301 Toevoegen van maaltijd", function () {
       });
   });
 
-  it("TC-301-3 Maaltijd succesvol toegevoegd", (done) => {
+  it.only("TC-301-3 Maaltijd succesvol toegevoegd", (done) => {
     const meal = {
       name: "Delicious Meal",
       description: "A tasty and nutritious meal",
@@ -226,7 +226,7 @@ describe("UC-301 Toevoegen van maaltijd", function () {
 });
 
 describe("UC-302 Wijzigen van maaltijdsgegevens", function () {
-  it("TC-302-1 Verplicht velden 'name' en/of 'price' en/of 'maxAmountOfParticipants' ontbreken", (done) => {
+  it.only("TC-302-1 Verplicht velden 'name' en/of 'price' en/of 'maxAmountOfParticipants' ontbreken", (done) => {
     const updatedMeal = {
       description: "Updated meal description",
       price: 10.99,
@@ -261,7 +261,7 @@ describe("UC-302 Wijzigen van maaltijdsgegevens", function () {
       });
   });
 
-  it("TC-302-2 Niet ingelogd", (done) => {
+  it.only("TC-302-2 Niet ingelogd", (done) => {
     const updatedMeal = {
       name: "Delicious Meal",
       description: "Updated meal description",
@@ -291,7 +291,7 @@ describe("UC-302 Wijzigen van maaltijdsgegevens", function () {
       });
   });
 
-  it("TC-302-3 Niet de eigenaar van de data", (done) => {
+  it.only("TC-302-3 Niet de eigenaar van de data", (done) => {
     const mealData = {
       name: "Delicious Meal",
       description: "A tasty and nutritious meal",
@@ -323,7 +323,7 @@ describe("UC-302 Wijzigen van maaltijdsgegevens", function () {
       });
   });
 
-  it("TC-302-4 Maaltijd bestaat niet", (done) => {
+  it.only("TC-302-4 Maaltijd bestaat niet", (done) => {
     const nonExistentMealId = mealId + 1; // ID of a non-existent meal
 
     const mealData = {
@@ -352,7 +352,7 @@ describe("UC-302 Wijzigen van maaltijdsgegevens", function () {
       });
   });
 
-  it("TC-302-5 Maaltijd succesvol gewijzigd", (done) => {
+  it.only("TC-302-5 Maaltijd succesvol gewijzigd", (done) => {
     const updatedMeal = {
       name: "Updated Meal",
       description: "A tasty and nutritious meal",
@@ -379,7 +379,7 @@ describe("UC-302 Wijzigen van maaltijdsgegevens", function () {
 });
 
 describe("UC-303 Opvragen van alle maaltijden", function () {
-  it("TC-303-1 Lijst van maaltijden geretourneerd", (done) => {
+  it.only("TC-303-1 Lijst van maaltijden geretourneerd", (done) => {
     chai
       .request(server)
       .get("/api/meal")
@@ -412,7 +412,7 @@ describe("UC-303 Opvragen van alle maaltijden", function () {
 });
 
 describe("UC-304 Verwijderen van maaltijde", function () {
-  it("TC-304-1 Maaltijd bestaat niet", (done) => {
+  it.only("TC-304-1 Maaltijd bestaat niet", (done) => {
     const nonExistentMealId = mealId + 1; // ID of a non-existent meal
 
     chai
@@ -436,10 +436,43 @@ describe("UC-304 Verwijderen van maaltijde", function () {
         }
       });
   });
+
+  it.only("TC-304-2 Details van maaltijd geretourneerd", (done) => {
+    chai
+      .request(server)
+      .get(`/api/meal/${mealId}`)
+      .end((err, res) => {
+        if (err) {
+          logger.error(err);
+        } else {
+          logger.info(res.body);
+          expect(res).to.have.status(200);
+          expect(res.body).to.be.an("object");
+          expect(res.body).to.have.property("status").to.equal(200);
+          expect(res.body)
+            .to.have.property("message")
+            .to.equal("Meal details retrieved successfully");
+          expect(res.body).to.have.property("data").to.be.an("object");
+
+          const meal = res.body.data.meal;
+          const cook = res.body.data.cook;
+          const participants = res.body.data.participants;
+
+          expect(meal).to.be.an("object");
+          expect(meal).to.have.property("id").to.equal(mealId);
+
+          expect(cook).to.be.an("object");
+
+          expect(participants).to.be.an("array");
+
+          done();
+        }
+      });
+  });
 });
 
 describe("UC-305 Verwijderen van maaltijd", function () {
-  it("TC-305-4 Maaltijd succesvol verwijderd", (done) => {
+  it.only("TC-305-4 Maaltijd succesvol verwijderd", (done) => {
     chai
       .request(server)
       .delete(`/api/meal/${mealId}`)
