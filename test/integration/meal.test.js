@@ -472,6 +472,26 @@ describe("UC-304 Verwijderen van maaltijde", function () {
 });
 
 describe("UC-305 Verwijderen van maaltijd", function () {
+  it.only("TC-305-1 Niet ingelogd", (done) => {
+    chai
+      .request(server)
+      .delete(`/api/meal/${mealId}`)
+      .end((err, res) => {
+        if (err) {
+          logger.error(err);
+        } else {
+          logger.info(res.body);
+          expect(res).to.have.status(401);
+          expect(res.body).to.deep.equal({
+            status: 401,
+            message: "Unauthorized: Missing or invalid token",
+            data: {},
+          });
+          done();
+        }
+      });
+  });
+
   it.only("TC-305-4 Maaltijd succesvol verwijderd", (done) => {
     chai
       .request(server)
