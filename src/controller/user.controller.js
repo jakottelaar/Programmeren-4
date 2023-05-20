@@ -106,9 +106,9 @@ const userController = {
             } else {
               const createdUser = rows[0];
               logger.info("Inserted new user with id:", createdUserId);
-              rows[0].isActive == true
-                ? (rows[0].isActive = true)
-                : (rows[0].isActive = false);
+
+              createdUser.isActive = createdUser.isActive === 1 ? true : false;
+
               res.status(201).json({
                 status: 201,
                 message: "User created successfully.",
@@ -153,10 +153,18 @@ const userController = {
           },
         });
       } else {
+        const users = results.map((user) => {
+          const convertedUser = {
+            ...user,
+            isActive: user.isActive === 1 ? true : false,
+          };
+          return convertedUser;
+        });
+
         res.status(200).json({
           status: 200,
           message: "Users retrieved successfully.",
-          data: results,
+          data: users,
         });
       }
     });
@@ -227,12 +235,14 @@ const userController = {
           data: {},
         });
       } else {
+        const user = results[0];
+        user.isActive = user.isActive === 1 ? true : false;
         logger.info(`Retrieved user by id: ${userId}`);
-        logger.info(`getUserById ${results}`);
+        logger.info(`getUserById ${user}`);
         res.status(200).json({
           status: 200,
           message: "User retrieved by id successfully.",
-          data: results,
+          data: user,
         });
       }
     });
@@ -310,6 +320,8 @@ const userController = {
                 });
               } else {
                 const updatedUserInfo = results[0];
+                updatedUserInfo.isActive =
+                  updatedUserInfo.isActive === 1 ? true : false;
                 res.status(200).json({
                   status: 200,
                   message: "Updated user",
