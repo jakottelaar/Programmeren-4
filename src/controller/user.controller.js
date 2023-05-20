@@ -164,13 +164,45 @@ const userController = {
 
   //Get request for getting a users profile (not yet implemented)
   getUserProfile: (req, res) => {
-    res.status(200).json({
-      status: 200,
-      message: "GET Request for profile info is not yet implemented!",
-      data: {
-        user: null,
-      },
-    });
+    const userId = req.userid;
+
+    let selectUserSqlStatement = "SELECT * FROM `user` WHERE id = ?";
+
+    pool.query(
+      selectUserSqlStatement,
+      [userId],
+      function (error, results, fields) {
+        if (error) {
+          logger.error(error);
+          return res.status(500).json({
+            status: 500,
+            message: "Failed to fetch user profile",
+            data: {
+              error,
+            },
+          });
+        }
+
+        if (results.length === 0) {
+          return res.status(404).json({
+            status: 404,
+            message: `User with ID ${userId} not found`,
+            data: {},
+          });
+        }
+
+        const user = results[0];
+        user.isActive = user.isActive === 1 ? true : false;
+
+        res.status(200).json({
+          status: 200,
+          message: "User profile retrieved successfully",
+          data: {
+            user: user,
+          },
+        });
+      }
+    );
   },
   //Get request for getting a user by their id
   getUserById: (req, res) => {
