@@ -513,6 +513,30 @@ describe("UC-305 Verwijderen van maaltijd", function () {
       });
   });
 
+  it.only("TC-305-3 Maaltijd bestaat niet", (done) => {
+    const nonExistentMealId = mealId + 1;
+
+    chai
+      .request(server)
+      .delete(`/api/meal/${nonExistentMealId}`)
+      .set("Authorization", `Bearer ${testToken}`)
+      .end((err, res) => {
+        if (err) {
+          logger.error(err);
+          done();
+        } else {
+          logger.info(res.body);
+          expect(res).to.have.status(404);
+          expect(res.body).to.be.an("object");
+          expect(res.body).to.have.property("status").to.equal(404);
+          expect(res.body)
+            .to.have.property("message")
+            .to.equal(`No meal with ID ${nonExistentMealId} found`);
+          done();
+        }
+      });
+  });
+
   it.only("TC-305-4 Maaltijd succesvol verwijderd", (done) => {
     chai
       .request(server)
