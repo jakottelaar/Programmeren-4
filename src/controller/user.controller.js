@@ -81,7 +81,9 @@ const userController = {
           res.status(500).json({
             status: 500,
             message: "Failed to create new user.",
-            error: error,
+            data: {
+              error: error,
+            },
           });
         }
       } else {
@@ -97,7 +99,9 @@ const userController = {
               res.status(500).json({
                 status: 500,
                 message: "Failed to fetch user information.",
-                error: error,
+                data: {
+                  error: error,
+                },
               });
             } else {
               const createdUser = rows[0];
@@ -144,7 +148,9 @@ const userController = {
         res.status(500).json({
           status: 500,
           message: "Failed to retrieve users.",
-          error: error,
+          data: {
+            error: error,
+          },
         });
       } else {
         res.status(200).json({
@@ -161,7 +167,9 @@ const userController = {
     res.status(200).json({
       status: 200,
       message: "GET Request for profile info is not yet implemented!",
-      user: null,
+      data: {
+        user: null,
+      },
     });
   },
   //Get request for getting a user by their id
@@ -176,7 +184,9 @@ const userController = {
         res.status(500).json({
           status: 500,
           message: `Error retrieving user by ID`,
-          error: error,
+          data: {
+            error: error,
+          },
         });
       } else if (results.length === 0) {
         res.status(404).json({
@@ -240,7 +250,9 @@ const userController = {
           res.status(500).json({
             status: 500,
             message: "Error updating user",
-            error: error,
+            data: {
+              error: error,
+            },
           });
         } else if (results.affectedRows === 0) {
           res.status(404).json({
@@ -260,7 +272,9 @@ const userController = {
                 res.status(500).json({
                   status: 500,
                   message: "Error retrieving updated user information",
-                  error: error,
+                  data: {
+                    error: error,
+                  },
                 });
               } else {
                 const updatedUserInfo = results[0];
@@ -288,7 +302,9 @@ const userController = {
         res.status(500).json({
           status: 500,
           message: `Error deleting user by ID`,
-          error: error,
+          data: {
+            error: error,
+          },
         });
       } else if (results.affectedRows === 0) {
         res.status(404).json({

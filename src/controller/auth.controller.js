@@ -111,9 +111,6 @@ module.exports = {
     next();
   },
 
-  //
-  //
-  //
   validateToken(req, res, next) {
     const authHeader = req.headers.authorization;
 
