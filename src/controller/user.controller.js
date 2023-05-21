@@ -5,6 +5,7 @@ const Joi = require("joi");
 const { log } = require("console");
 
 const schema = Joi.object({
+  id: Joi.number().optional(),
   firstName: Joi.string().required(),
   lastName: Joi.string().min(2).required(),
   street: Joi.string().allow("").required(),
@@ -39,6 +40,7 @@ const schema = Joi.object({
 });
 
 const updateSchema = Joi.object({
+  id: Joi.number().optional(),
   firstName: Joi.string().optional(),
   lastName: Joi.string().min(2).optional(),
   street: Joi.string().allow("").optional(),
