@@ -203,7 +203,7 @@ describe("UC-301 Toevoegen van maaltijd", function () {
           expect(data).to.have.property("isToTakeHome").to.equal(false);
           expect(data).to.have.property("dateTime");
           expect(data).to.have.property("maxAmountOfParticipants").to.equal(20);
-          expect(data).to.have.property("price").to.equal("10.99");
+          expect(data).to.have.property("price").to.equal(10.99);
           expect(data)
             .to.have.property("imageUrl")
             .to.equal("https://example.com/meal-image.jpg");
