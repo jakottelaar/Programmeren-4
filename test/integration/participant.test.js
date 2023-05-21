@@ -256,6 +256,25 @@ describe("UC-402 Afmelden voor maaltijd", (done) => {
         }
       });
   });
+
+  it("TC-402-4 should successfully cancel registration for a meal", (done) => {
+    chai
+      .request(server)
+      .delete(`/api/participate/${testMealId}`)
+      .set("Authorization", `Bearer ${testToken}`)
+      .end((err, res) => {
+        expect(res).to.have.status(200);
+        expect(res.body).to.be.an("object");
+        expect(res.body).to.have.property("status", 200);
+        expect(res.body)
+          .to.have.property("message")
+          .equal(
+            `User with ID ${testUserId} has been unregistered for meal with ID ${testMealId}`
+          );
+        expect(res.body.data).to.deep.equal({});
+        done();
+      });
+  });
 });
 
 after((done) => {
