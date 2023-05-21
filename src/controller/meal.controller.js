@@ -38,37 +38,87 @@ const updateMealSchema = Joi.object({
 });
 
 const fetchMealById = (mealId, cookId, callback) => {
-  const getMealSqlStatement = "SELECT * FROM `meal` WHERE id = ?";
-  pool.query(getMealSqlStatement, [mealId], function (error, results, fields) {
-    if (error) {
-      logger.error(error);
+  pool.getConnection((err, connection) => {
+    if (err) {
+      logger.error("Error getting connection from pool");
       callback({
         status: 500,
-        message: "Failed to fetch meal by id",
-        data: {
-          error,
-        },
-      });
-    } else if (results.length === 0) {
-      callback({
-        status: 404,
-        message: `No meal with ID ${mealId} found`,
+        message: err.code,
         data: {},
       });
-    } else {
-      const meal = results[0];
+      return;
+    }
 
-      // Check if the user calling the endpoint is the cook
-      if (meal.cookId !== cookId) {
+    const getMealSqlStatement = "SELECT * FROM `meal` WHERE id = ?";
+    connection.query(
+      getMealSqlStatement,
+      [mealId],
+      function (error, results, fields) {
+        connection.release(); // Release the connection back to the pool
+
+        if (error) {
+          logger.error(error);
+          callback({
+            status: 500,
+            message: "Failed to fetch meal by id",
+            data: {
+              error,
+            },
+          });
+        } else if (results.length === 0) {
+          callback({
+            status: 404,
+            message: `No meal with ID ${mealId} found`,
+            data: {},
+          });
+        } else {
+          const meal = results[0];
+
+          // Check if the user calling the endpoint is the cook
+          if (meal.cookId !== cookId) {
+            callback({
+              status: 403,
+              message: `Not authorized to perform this operation on the meal with ID ${meal.id}`,
+              data: {},
+            });
+          } else {
+            callback(null, meal);
+          }
+        }
+      }
+    );
+  });
+};
+
+const executeQuery = (sqlStatement, params, callback) => {
+  pool.getConnection((err, connection) => {
+    if (err) {
+      logger.error("Error getting connection from pool");
+      callback({
+        status: 500,
+        message: err.code,
+        data: {},
+      });
+      return;
+    }
+
+    connection.query(sqlStatement, params, (error, results, fields) => {
+      connection.release(); // Release the connection back to the pool
+
+      if (error) {
+        logger.error(error);
+
         callback({
-          status: 403,
-          message: `Not authorized to perform this operation on the meal with ID ${meal.id}`,
-          data: {},
+          status: 500,
+          message: "Failed to execute query",
+          data: {
+            error,
+          },
         });
       } else {
-        callback(null, meal);
+        callback(null, results, fields);
       }
-    }
+    });
   });
 };
 
@@ -90,7 +140,7 @@ const mealController = {
 
     const dateTime = DATE_FORMATTER(new Date(), "yyyy-mm-dd HH:MM:ss");
 
-    userId = req.userId;
+    const userId = req.userId;
 
     logger.info(`CreateMeal UserId: ${userId}`);
 
@@ -112,10 +162,8 @@ const mealController = {
 
     let sqlStatement = "INSERT INTO meal SET ?";
 
-    pool.query(sqlStatement, newMeal, function (error, results, fields) {
+    executeQuery(sqlStatement, newMeal, (error, results, fields) => {
       if (error) {
-        logger.error(error);
-
         res.status(500).json({
           status: 500,
           message: "Failed to create meal.",
@@ -127,12 +175,11 @@ const mealController = {
         const createdMealId = results.insertId;
 
         let getInsertedMealResultStatement = "SELECT * FROM meal WHERE id = ?";
-        pool.query(
+        executeQuery(
           getInsertedMealResultStatement,
           createdMealId,
-          function (error, results, fields) {
+          (error, results, fields) => {
             if (error) {
-              logger.error(error);
               res.status(500).json({
                 status: 500,
                 message: "Failed to fetch meal information",
@@ -200,10 +247,10 @@ const mealController = {
       // Update the meal in the database
       const updateMealSqlStatement = "UPDATE `meal` SET ? WHERE id = ?";
 
-      pool.query(
+      executeQuery(
         updateMealSqlStatement,
         [input, mealId],
-        function (error, results, fields) {
+        (error, results, fields) => {
           if (error) {
             logger.error(error);
             return res.status(500).json({
@@ -226,10 +273,10 @@ const mealController = {
           logger.info(`Updated meal by id: ${mealId}`);
 
           const selectMealStatement = "SELECT * FROM `meal` WHERE id = ?";
-          pool.query(
+          executeQuery(
             selectMealStatement,
             mealId,
-            function (error, results, fields) {
+            (error, results, fields) => {
               if (error) {
                 logger.error(error);
                 return res.status(500).json({
@@ -278,12 +325,12 @@ const mealController = {
         });
       }
 
-      const cookId = mealResults[0].cookId;
+      const cookIds = mealResults.map((meal) => meal.cookId);
 
-      let getCookInfoSqlStatement = "SELECT * FROM user WHERE id = ?";
+      let getCookInfoSqlStatement = "SELECT * FROM user WHERE id IN (?)";
       pool.query(
         getCookInfoSqlStatement,
-        cookId,
+        [cookIds],
         function (error, cookResults, fields) {
           if (error) {
             logger.error(error);
@@ -296,9 +343,14 @@ const mealController = {
             });
           }
 
-          const cook = { ...cookResults[0] };
-          cook.isActive = cook.isActive === 1 ? true : false;
-          delete cook.password;
+          const cooks = cookResults.reduce((acc, cook) => {
+            const convertedCook = { ...cook };
+            convertedCook.isActive =
+              convertedCook.isActive === 1 ? true : false;
+            delete convertedCook.password;
+            acc[cook.id] = convertedCook;
+            return acc;
+          }, {});
 
           let getParticipantsSqlStatement = `
           SELECT *
@@ -350,7 +402,7 @@ const mealController = {
 
                 return {
                   meal: convertedMeal,
-                  cook: cook,
+                  cook: cooks[meal.cookId] || {},
                   participants: participantsByMeal[meal.id] || [],
                 };
               });
@@ -422,10 +474,10 @@ const mealController = {
                 delete cook.password;
 
                 let getParticipantsSqlStatement = `
-            SELECT *
-            FROM meal_participants_user mp
-            INNER JOIN user u ON mp.userId = u.id
-            WHERE mp.mealId = ?`;
+              SELECT *
+              FROM meal_participants_user mp
+              INNER JOIN user u ON mp.userId = u.id
+              WHERE mp.mealId = ?`;
 
                 pool.query(
                   getParticipantsSqlStatement,
