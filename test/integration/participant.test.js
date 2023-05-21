@@ -6,7 +6,7 @@ const { logger } = require("../../src/util/utils");
 chai.use(chaiHttp);
 const expect = chai.expect;
 
-let mealId = 0;
+let testMealId = 0;
 let testToken = 0;
 let testUserId = 0;
 
@@ -14,10 +14,6 @@ let testToken2 = 0;
 let testUserId2 = 0;
 
 describe("UC-401 Aanmelden voor maaltijd", () => {
-  let testUserId;
-  let testToken;
-  let testMealId;
-
   before((done) => {
     const testUser1 = {
       firstName: "participateTest",
@@ -120,26 +116,25 @@ describe("UC-401 Aanmelden voor maaltijd", () => {
         done();
       });
   });
+});
+after((done) => {
+  chai
+    .request(server)
+    .delete(`/api/user/${testUserId}`)
+    .end((err, res) => {
+      if (err) {
+        logger.error(err);
+      }
+    });
 
-  after((done) => {
-    chai
-      .request(server)
-      .delete(`/api/user/${testUserId}`)
-      .end((err, res) => {
-        if (err) {
-          logger.error(err);
-        }
-      });
-
-    chai
-      .request(server)
-      .delete(`/api/meal/${testMealId}`)
-      .set("Authorization", `Bearer ${testToken}`)
-      .end((err, res) => {
-        if (err) {
-          logger.error(err);
-        }
-        done();
-      });
-  });
+  chai
+    .request(server)
+    .delete(`/api/meal/${testMealId}`)
+    .set("Authorization", `Bearer ${testToken}`)
+    .end((err, res) => {
+      if (err) {
+        logger.error(err);
+      }
+      done();
+    });
 });
