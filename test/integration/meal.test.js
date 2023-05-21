@@ -355,6 +355,7 @@ describe("UC-302 Wijzigen van maaltijdsgegevens", function () {
     const updatedMeal = {
       name: "Updated Meal",
       description: "A tasty and nutritious meal",
+      isVega: 1,
       price: 10.99,
       maxAmountOfParticipants: 20,
       imageUrl: "https://example.com/meal-image.jpg",
@@ -367,6 +368,7 @@ describe("UC-302 Wijzigen van maaltijdsgegevens", function () {
       .set("Authorization", `Bearer ${testToken}`)
       .send(updatedMeal)
       .end((err, res) => {
+        logger.info(res.body);
         expect(res.body).to.be.an("object");
         expect(res.body.status).to.equal(200);
         expect(res.body.message).to.equal("Updated meal");
