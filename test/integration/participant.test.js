@@ -80,7 +80,7 @@ describe("UC-401 Aanmelden voor maaltijd", () => {
       });
   });
 
-  it("TC-401-1 Niet ingelogd", (done) => {
+  it.only("TC-401-1 Niet ingelogd", (done) => {
     chai
       .request(server)
       .post(`/api/meal/${testMealId}/participate`)
@@ -96,7 +96,7 @@ describe("UC-401 Aanmelden voor maaltijd", () => {
       });
   });
 
-  it("TC-401-2 Maaltijd bestaat niet", (done) => {
+  it.only("TC-401-2 Maaltijd bestaat niet", (done) => {
     const nonExistentMealId = testMealId + 1; // ID of a non-existent meal
 
     chai
@@ -120,7 +120,7 @@ describe("UC-401 Aanmelden voor maaltijd", () => {
       });
   });
 
-  it("TC-401-3 Succesvol aangemeld", (done) => {
+  it.only("TC-401-3 Succesvol aangemeld", (done) => {
     chai
       .request(server)
       .post(`/api/meal/${testMealId}/participate`)
@@ -142,6 +142,24 @@ describe("UC-401 Aanmelden voor maaltijd", () => {
 
           done();
         }
+      });
+  });
+});
+
+describe("UC-402 Afmelden voor maaltijd", (done) => {
+  it.only("TC-402-1 Niet ingelogd", (done) => {
+    chai
+      .request(server)
+      .post(`/api/meal/${testMealId}/participate`)
+      .end((err, res) => {
+        expect(res.body).to.be.an("object");
+        expect(res.body).to.have.property("status").to.equal(401);
+        expect(res.body)
+          .to.have.property("message")
+          .to.equal("Unauthorized: Missing or invalid token");
+        expect(res.body).to.have.property("data").to.be.empty;
+
+        done();
       });
   });
 });
