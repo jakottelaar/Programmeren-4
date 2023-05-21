@@ -2,37 +2,73 @@ const logger = require("../util/utils").logger;
 const pool = require("../util/mysql");
 const Joi = require("joi");
 
+const fetchMealById = (mealId, callback) => {
+  const getMealSqlStatement = "SELECT * FROM `meal` WHERE id = ?";
+  pool.query(getMealSqlStatement, [mealId], function (error, results, fields) {
+    if (error) {
+      logger.error(error);
+      callback({
+        status: 500,
+        message: "Failed to fetch meal by id",
+        data: {
+          error,
+        },
+      });
+    } else if (results.length === 0) {
+      callback({
+        status: 404,
+        message: `No meal with ID ${mealId} found`,
+        data: {},
+      });
+    } else {
+      const meal = results[0];
+      callback(null, meal);
+    }
+  });
+};
+
 const participateController = {
   signUpForAMeal: (req, res) => {
     const mealId = parseInt(req.params.mealId);
     const userId = req.headers.userid;
 
-    let signUpUserToMealSqlStatement =
-      "INSERT INTO meal_participants_user SET ?";
+    fetchMealById(mealId, (error, meal) => {
+      if (error) {
+        return res.status(error.status).json({
+          status: error.status,
+          message: error.message,
+          data: error.data,
+        });
+      }
 
-    pool.query(
-      signUpUserToMealSqlStatement,
-      { mealId: mealId, userId: userId },
-      function (error, results, fields) {
-        if (error) {
-          logger.error(error);
+      const signUpUserToMealSqlStatement =
+        "INSERT INTO meal_participants_user SET ?";
+      const signUpData = { mealId: mealId, userId: userId };
 
-          res.status(500).json({
-            status: 500,
-            message: "Failed to signUp user for meal",
-            data: {
-              error: error,
-            },
-          });
-        } else {
+      pool.query(
+        signUpUserToMealSqlStatement,
+        signUpData,
+        function (error, results, fields) {
+          if (error) {
+            logger.error(error);
+
+            return res.status(500).json({
+              status: 500,
+              message: "Failed to sign up user for meal",
+              data: {
+                error: error,
+              },
+            });
+          }
+
           res.status(200).json({
             status: 200,
-            message: `User met ID ${userId} is aangemeld voor maaltijd met ID ${mealId}`,
+            message: `User with ID ${userId} has been signed up for meal with ID ${mealId}`,
             data: results,
           });
         }
-      }
-    );
+      );
+    });
   },
 
   cancelRegistrationForMeal: (req, res) => {
