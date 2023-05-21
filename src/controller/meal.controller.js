@@ -164,7 +164,7 @@ const mealController = {
       isToTakeHome: input.isToTakeHome || 0,
       dateTime: dateTime,
       maxAmountOfParticipants: input.maxAmountOfParticipants,
-      price: input.price,
+      price: parseFloat(input.price),
       imageUrl: input.imageUrl,
       allergenes: allergenes,
       cookId: userId,
@@ -209,6 +209,7 @@ const mealController = {
                 isVega: createdMeal.isVega === 1 ? true : false,
                 isVegan: createdMeal.isVegan === 1 ? true : false,
                 isToTakeHome: createdMeal.isToTakeHome === 1 ? true : false,
+                price: parseFloat(createdMeal.price),
               };
               res.status(201).json({
                 status: 201,
