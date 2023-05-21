@@ -1,7 +1,7 @@
 const logger = require("../util/utils").logger;
 const pool = require("../util/mysql");
 const Joi = require("joi");
-const DATE_FORMATER = require("dateformat");
+const DATE_FORMATTER = require("dateformat");
 
 const createMealSchema = Joi.object({
   name: Joi.string().required(),
@@ -86,7 +86,7 @@ const mealController = {
 
     logger.info(req.body);
 
-    const dateTime = DATE_FORMATER(new Date(), "yyyy-mm-dd HH:MM:ss");
+    const dateTime = DATE_FORMATTER(new Date(), "yyyy-mm-dd HH:MM:ss");
     const userId = req.headers.userid;
 
     const newMeal = {
