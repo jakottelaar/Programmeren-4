@@ -33,8 +33,8 @@ module.exports = {
       }
 
       connection.query(
-        "SELECT * FROM user WHERE emailAddress = ?",
-        [emailAddress],
+        `SELECT * FROM user WHERE emailAddress IN (${emailPlaceholders})`,
+        emailAddresses,
         (error, results) => {
           if (error) {
             logger.error("Error executing SQL query");
@@ -99,21 +99,14 @@ module.exports = {
         .required()
         .label("Email Address")
         .messages({ "any.required": `Email address is required` }),
-      emailAdress: Joi.string()
-        .required()
-        .valid(Joi.ref("emailAddress")) // Validate that emailAdress matches emailAddress
-        .label("Email Address"),
+
       password: Joi.string()
         .required()
         .label("Password")
         .messages({ "any.required": `Password is required` }),
     });
 
-    const { error } = schema.validate(req.body, {
-      messages: {
-        "any.required": `emailAdress is required`,
-      },
-    });
+    const { error } = schema.validate(req.body);
 
     if (error) {
       return res.status(400).json({
