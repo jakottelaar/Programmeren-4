@@ -172,7 +172,7 @@ const userController = {
 
   //Get request for getting a users profile (not yet implemented)
   getUserProfile: (req, res) => {
-    const userId = req.userid;
+    const userId = req.userId;
 
     let selectUserSqlStatement = "SELECT * FROM `user` WHERE id = ?";
 
