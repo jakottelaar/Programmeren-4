@@ -99,7 +99,7 @@ module.exports = {
         .required()
         .label("Email Address")
         .messages({ "any.required": `Email address is required` }),
-
+      emailAdress: Joi.string().optional(),
       password: Joi.string()
         .required()
         .label("Password")
