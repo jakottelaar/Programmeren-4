@@ -12,6 +12,7 @@ const createMealSchema = Joi.object({
   isToTakeHome: Joi.any().optional(),
   isActive: Joi.any().optional(),
   dateTime: Joi.string().optional(),
+  cookId: Joi.number().optional(),
   price: Joi.number().required(),
   maxAmountOfParticipants: Joi.number().required(),
   imageUrl: Joi.string().required(),
@@ -29,6 +30,7 @@ const updateMealSchema = Joi.object({
   isToTakeHome: Joi.any().optional(),
   isActive: Joi.any().optional(),
   dateTime: Joi.string().optional(),
+  cookId: Joi.number().optional(),
   price: Joi.number().required().messages({
     "any.required": "Name is a required field",
   }),
