@@ -4,6 +4,7 @@ const Joi = require("joi");
 const DATE_FORMATTER = require("dateformat");
 
 const createMealSchema = Joi.object({
+  id: Joi.number().optional(),
   name: Joi.string().required(),
   description: Joi.string().required(),
   isVega: Joi.any().optional(),
@@ -17,6 +18,7 @@ const createMealSchema = Joi.object({
 });
 
 const updateMealSchema = Joi.object({
+  id: Joi.number().optional(),
   name: Joi.string().required().messages({
     "any.required": "Name is a required field",
   }),
@@ -93,6 +95,7 @@ const mealController = {
     logger.info(`CreateMeal UserId: ${userId}`);
 
     const newMeal = {
+      id: input.id,
       name: input.name,
       description: input.description,
       isActive: input.isActive || 1,
