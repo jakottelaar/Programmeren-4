@@ -127,9 +127,9 @@ module.exports = {
     try {
       const decoded = jwt.verify(token, jwtSecretKey);
 
-      req.userid = decoded.userId;
+      req.userId = decoded.userId;
 
-      logger.info(req.userid);
+      logger.info(`Validation for token called with userId: ${req.userId}`);
 
       next();
     } catch (err) {
