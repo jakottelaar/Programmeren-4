@@ -76,13 +76,12 @@ module.exports = {
           // Generate token
           const token = jwt.sign(payload, jwtSecretKey);
 
+          const userWithToken = { ...user, token };
+
           res.status(200).json({
             status: 200,
             message: "Login successful",
-            data: {
-              user,
-              token,
-            },
+            data: userWithToken,
           });
         }
       );

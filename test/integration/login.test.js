@@ -159,7 +159,7 @@ describe("UC-101 inloggen", function () {
 
           const { data, message } = res.body;
 
-          expect(data).to.be.an("object").to.have.property("user");
+          expect(data).to.be.an("object").to.have.property("id");
           expect(data).to.have.property("token");
 
           done();
