@@ -1,6 +1,4 @@
-//
-// Authentication controller
-//
+const bcrypt = require("bcrypt");
 const Joi = require("joi");
 const jwt = require("jsonwebtoken");
 const pool = require("../util/mysql");
@@ -56,32 +54,45 @@ module.exports = {
 
           const user = results[0];
 
-          // Check password
-          if (user.password !== password) {
-            // Incorrect password
-            return res.status(400).json({
-              status: 400,
-              message: "Invalid password",
-              data: {},
+          // Compare the provided password with the hashed password stored in the database
+          bcrypt.compare(password, user.password, (err, result) => {
+            if (err) {
+              logger.error("Failed to compare passwords");
+              return next({
+                status: 500,
+                message: "Failed to compare passwords",
+                data: {
+                  error: err,
+                },
+              });
+            }
+
+            if (!result) {
+              // Incorrect password
+              return res.status(400).json({
+                status: 400,
+                message: "Invalid password",
+                data: {},
+              });
+            }
+
+            delete user.password;
+
+            // Create payload
+            const payload = {
+              userId: user.id,
+            };
+
+            // Generate token
+            const token = jwt.sign(payload, jwtSecretKey);
+
+            const userWithToken = { ...user, token };
+
+            res.status(200).json({
+              status: 200,
+              message: "Login successful",
+              data: userWithToken,
             });
-          }
-
-          delete user.password;
-
-          // Create payload
-          const payload = {
-            userId: user.id,
-          };
-
-          // Generate token
-          const token = jwt.sign(payload, jwtSecretKey);
-
-          const userWithToken = { ...user, token };
-
-          res.status(200).json({
-            status: 200,
-            message: "Login successful",
-            data: userWithToken,
           });
         }
       );
