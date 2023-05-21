@@ -4,6 +4,7 @@ const server = require("../../app");
 const { logger } = require("../../src/util/utils");
 let userId = 0; //This userId will get the id assignment from the first create user test and use it throughout all the tests up and until it's deleted;
 let token = 0;
+let anotherUserId = 0;
 
 chai.use(chaiHttp);
 const expect = chai.expect;
@@ -432,6 +433,62 @@ describe("UC-205 Gebruiker wijzingen", () => {
       });
   });
 
+  it("TC-205-2 De gebruiker is niet de eigenaar van de data", (done) => {
+    // Create a new user for the test
+    const newUser = {
+      firstName: "AnotherUser",
+      lastName: "Tester",
+      emailAddress: "a.notheruser@example.com",
+      password: "AnotherPassword123",
+      street: "789 Main St",
+      city: "Anytown",
+      phoneNumber: "0612345678",
+    };
+
+    // Register the new user
+    chai
+      .request(server)
+      .post("/api/user")
+      .send(newUser)
+      .end((err, res) => {
+        expect(err).to.be.null;
+        expect(res).to.have.status(201);
+
+        // Get the ID of the newly created user
+        anotherUserId = res.body.data.id;
+        logger.info(`Another user id : ${anotherUserId}`);
+
+        // Attempt to update the user's data with another user's ID
+        chai
+          .request(server)
+          .put(`/api/user/${anotherUserId}`)
+          .set("Authorization", `Bearer ${token}`)
+          .send({
+            firstName: "ModifiedUser",
+            lastName: "ModifiedLastName",
+            emailAddress: "m.odifieduser@example.com",
+            password: "ModifiedPassword123",
+            street: "ModifiedStreet",
+            city: "ModifiedCity",
+            phoneNumber: "0612345678",
+          })
+          .end((err, res) => {
+            expect(err).to.be.null;
+            expect(res).to.have.status(403);
+            expect(res.body).to.be.an("object");
+
+            const { status, message } = res.body;
+
+            expect(status).to.equal(403);
+            expect(message).to.equal(
+              "You are not authorized to update this user's data."
+            );
+
+            done();
+          });
+      });
+  });
+
   it("TC-205-3 Niet-valide telefoonnummer", (done) => {
     const invalidPhoneNumber = "12345";
 
@@ -449,6 +506,7 @@ describe("UC-205 Gebruiker wijzingen", () => {
         phoneNumber: invalidPhoneNumber,
       })
       .end((err, res) => {
+        logger.info(res.body);
         expect(err).to.be.null;
         expect(res).to.have.status(400);
         expect(res.body).to.be.an("object");
@@ -560,4 +618,16 @@ describe("UC-206 Verwijderen van user", () => {
         done();
       });
   });
+});
+
+after((done) => {
+  chai
+    .request(server)
+    .delete(`/api/user/${anotherUserId}`)
+    .end((userErr, userRes) => {
+      if (userErr) {
+        logger.error(userErr);
+      }
+      done();
+    });
 });
