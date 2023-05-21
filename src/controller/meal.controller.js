@@ -148,6 +148,8 @@ const mealController = {
 
     logger.info(`CreateMeal UserId: ${userId}`);
 
+    const allergenes = input.allergenes.join(", ");
+
     const newMeal = {
       id: input.id,
       name: input.name,
@@ -160,7 +162,7 @@ const mealController = {
       maxAmountOfParticipants: input.maxAmountOfParticipants,
       price: input.price,
       imageUrl: input.imageUrl,
-      allergenes: input.allergenes,
+      allergenes: allergenes,
       cookId: userId,
     };
 
