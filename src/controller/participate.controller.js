@@ -62,6 +62,38 @@ const fetchParticipantById = (userId, mealId, callback) => {
   });
 };
 
+const executeQuery = (sqlStatement, params, callback) => {
+  pool.getConnection((err, connection) => {
+    if (err) {
+      logger.error("Error getting connection from pool");
+      callback({
+        status: 500,
+        message: err.code,
+        data: {},
+      });
+      return;
+    }
+
+    connection.query(sqlStatement, params, (error, results, fields) => {
+      connection.release(); // Release the connection back to the pool
+
+      if (error) {
+        logger.error(error);
+
+        callback({
+          status: 500,
+          message: "Failed to execute query",
+          data: {
+            error,
+          },
+        });
+      } else {
+        callback(null, results, fields);
+      }
+    });
+  });
+};
+
 const participateController = {
   signUpForAMeal: (req, res) => {
     const mealId = parseInt(req.params.mealId);
@@ -80,7 +112,7 @@ const participateController = {
         "INSERT INTO meal_participants_user SET ?";
       const signUpData = { mealId: mealId, userId: userId };
 
-      pool.query(
+      executeQuery(
         signUpUserToMealSqlStatement,
         signUpData,
         function (error, results, fields) {
@@ -124,9 +156,9 @@ const participateController = {
       }
 
       let cancelRegistrationSqlStatement =
-        "DELETE FROM meal_participants_user  WHERE mealId = ? AND userId = ?";
+        "DELETE FROM meal_participants_user WHERE mealId = ? AND userId = ?";
 
-      pool.query(
+      executeQuery(
         cancelRegistrationSqlStatement,
         [mealId, userId],
         function (error, results, fields) {
@@ -134,7 +166,7 @@ const participateController = {
             logger.error(error);
             res.status(500).json({
               status: 500,
-              message: "Failed to cancel registration user for meal",
+              message: "Failed to cancel user registration for meal",
               data: {
                 error: error,
               },
@@ -161,19 +193,15 @@ const participateController = {
       WHERE mp.mealId = ?
     `;
 
-    pool.query(
+    executeQuery(
       getParticipantsSqlStatement,
-      mealId,
+      [mealId],
       function (error, results, fields) {
         if (error) {
-          logger.error(error);
-
-          res.status(500).json({
-            status: 500,
-            message: "Failed to retrieve participants",
-            data: {
-              error: error,
-            },
+          res.status(error.status).json({
+            status: error.status,
+            message: error.message,
+            data: error.data,
           });
         } else {
           const convertedResults = results.map((participant) => ({
@@ -211,25 +239,21 @@ const participateController = {
     const participantId = req.params.participantId;
 
     let getParticipantSqlStatement = `
-    SELECT *
-    FROM meal_participants_user mp
-    INNER JOIN user u ON mp.userId = u.id
-    WHERE mp.mealId = ? AND u.id = ?
-  `;
+      SELECT *
+      FROM meal_participants_user mp
+      INNER JOIN user u ON mp.userId = u.id
+      WHERE mp.mealId = ? AND u.id = ?
+    `;
 
-    pool.query(
+    executeQuery(
       getParticipantSqlStatement,
       [mealId, participantId],
       function (error, results, fields) {
         if (error) {
-          logger.error(error);
-
-          res.status(500).json({
-            status: 500,
-            message: "Failed to retrieve participant",
-            data: {
-              error: error,
-            },
+          res.status(error.status).json({
+            status: error.status,
+            message: error.message,
+            data: error.data,
           });
         } else {
           if (results.length === 0) {
