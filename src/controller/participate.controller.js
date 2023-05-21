@@ -120,6 +120,56 @@ const participateController = {
       }
     );
   },
+
+  getParticipantById: (req, res) => {
+    const mealId = req.params.mealId;
+    const participantId = req.params.participantId;
+
+    let getParticipantSqlStatement = `
+    SELECT *
+    FROM meal_participants_user mp
+    INNER JOIN user u ON mp.userId = u.id
+    WHERE mp.mealId = ? AND u.id = ?
+  `;
+
+    pool.query(
+      getParticipantSqlStatement,
+      [mealId, participantId],
+      function (error, results, fields) {
+        if (error) {
+          logger.error(error);
+
+          res.status(500).json({
+            status: 500,
+            message: "Failed to retrieve participant",
+            data: {
+              error: error,
+            },
+          });
+        } else {
+          if (results.length === 0) {
+            res.status(404).json({
+              status: 404,
+              message: "Participant not found",
+              data: {},
+            });
+          } else {
+            const participant = results[0];
+            delete participant.password;
+            delete participant.userId;
+            delete participant.mealId;
+            delete participant.roles;
+
+            res.status(200).json({
+              status: 200,
+              message: "Participant details retrieved successfully",
+              data: participant,
+            });
+          }
+        }
+      }
+    );
+  },
 };
 
 module.exports = participateController;

@@ -17,4 +17,9 @@ participateRouter.get(
   participantController.getAllParticipants
 );
 
+participateRouter.get(
+  "/:mealId/participants/:participantId",
+  participantController.getParticipantById
+);
+
 module.exports = participateRouter;
