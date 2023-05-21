@@ -14,7 +14,13 @@ module.exports = {
    * Retourneer een geldig token indien succesvol
    */
   login(req, res, next) {
-    const { emailAddress, password } = req.body;
+    const { emailAddress, emailAdress, password } = req.body;
+
+    // Combine both email properties into an array
+    const emailAddresses = [emailAddress, emailAdress];
+
+    // Use a placeholder (?) for each email property
+    const emailPlaceholders = emailAddresses.map(() => "?").join(", ");
 
     pool.getConnection((err, connection) => {
       if (err) {
@@ -93,13 +99,21 @@ module.exports = {
         .required()
         .label("Email Address")
         .messages({ "any.required": `Email address is required` }),
+      emailAdress: Joi.string()
+        .required()
+        .valid(Joi.ref("emailAddress")) // Validate that emailAdress matches emailAddress
+        .label("Email Address"),
       password: Joi.string()
         .required()
         .label("Password")
         .messages({ "any.required": `Password is required` }),
     });
 
-    const { error } = schema.validate(req.body);
+    const { error } = schema.validate(req.body, {
+      messages: {
+        "any.required": `emailAdress is required`,
+      },
+    });
 
     if (error) {
       return res.status(400).json({
