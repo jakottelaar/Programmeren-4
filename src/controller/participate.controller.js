@@ -27,6 +27,41 @@ const fetchMealById = (mealId, callback) => {
   });
 };
 
+const fetchParticipantById = (userId, mealId, callback) => {
+  fetchMealById(mealId, (error, meal) => {
+    if (error) {
+      callback(error);
+    } else {
+      const getParticipantSqlStatement =
+        "SELECT * FROM `meal_participants_user` WHERE mealId = ? AND userId = ?";
+      pool.query(
+        getParticipantSqlStatement,
+        [mealId, userId],
+        function (error, results, fields) {
+          if (error) {
+            logger.error(error);
+            callback({
+              status: 500,
+              message: "Failed to check participant's sign-up status for meal",
+              data: {
+                error,
+              },
+            });
+          } else if (results.length === 0) {
+            callback({
+              status: 404,
+              message: `No participation for user with ID ${userId} found for meal ${mealId}`,
+              data: {},
+            });
+          } else {
+            callback(null, true); // Participant is signed up for the meal
+          }
+        }
+      );
+    }
+  });
+};
+
 const participateController = {
   signUpForAMeal: (req, res) => {
     const mealId = parseInt(req.params.mealId);
@@ -72,34 +107,48 @@ const participateController = {
   },
 
   cancelRegistrationForMeal: (req, res) => {
-    const userId = req.headers.userid;
     const mealId = parseInt(req.params.mealId);
+    const userId = req.userId;
 
-    let cancelRegistrationSqlStatement =
-      "DELETE FROM meal_participants_user WHERE userId = ?";
-
-    pool.query(
-      cancelRegistrationSqlStatement,
-      [userId],
-      function (error, results, fields) {
-        if (error) {
-          logger.error(error);
-          res.status(500).json({
-            status: 500,
-            message: "Failed to cancel registration user for meal",
-            data: {
-              error: error,
-            },
-          });
-        } else {
-          res.status(200).json({
-            status: 200,
-            message: `User met ID ${userId} is afgemeld voor maaltijd met ID ${mealId}`,
-            data: {},
-          });
-        }
-      }
+    logger.info(
+      `User with id ${userId} canceling participation for meal with id ${mealId}`
     );
+
+    fetchParticipantById(userId, mealId, (error, meal) => {
+      if (error) {
+        return res.status(error.status).json({
+          status: error.status,
+          message: error.message,
+          data: error.data,
+        });
+      }
+
+      let cancelRegistrationSqlStatement =
+        "DELETE FROM meal_participants_user  WHERE mealId = ? AND userId = ?";
+
+      pool.query(
+        cancelRegistrationSqlStatement,
+        [mealId, userId],
+        function (error, results, fields) {
+          if (error) {
+            logger.error(error);
+            res.status(500).json({
+              status: 500,
+              message: "Failed to cancel registration user for meal",
+              data: {
+                error: error,
+              },
+            });
+          } else {
+            res.status(200).json({
+              status: 200,
+              message: `User met ID ${userId} is afgemeld voor maaltijd met ID ${mealId}`,
+              data: {},
+            });
+          }
+        }
+      );
+    });
   },
 
   getAllParticipants: (req, res) => {

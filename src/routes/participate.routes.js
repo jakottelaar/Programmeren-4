@@ -11,6 +11,7 @@ participateRouter.post(
 
 participateRouter.delete(
   "/:mealId/participate",
+  loginController.validateToken,
   participantController.cancelRegistrationForMeal
 );
 
