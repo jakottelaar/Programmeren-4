@@ -13,7 +13,7 @@ const createMealSchema = Joi.object({
   price: Joi.number().required(),
   maxAmountOfParticipants: Joi.number().required(),
   imageUrl: Joi.string().required(),
-  allergenes: Joi.string().optional(),
+  allergenes: Joi.any().optional(),
 });
 
 const updateMealSchema = Joi.object({
@@ -21,10 +21,10 @@ const updateMealSchema = Joi.object({
     "any.required": "Name is a required field",
   }),
   description: Joi.string().required(),
-  isVega: Joi.number().optional(),
-  isVegan: Joi.number().optional(),
-  isToTakeHome: Joi.number().optional(),
-  isActive: Joi.number().optional(),
+  isVega: Joi.any().optional(),
+  isVegan: Joi.any().optional(),
+  isToTakeHome: Joi.any().optional(),
+  isActive: Joi.any().optional(),
   price: Joi.number().required().messages({
     "any.required": "Name is a required field",
   }),
@@ -32,7 +32,7 @@ const updateMealSchema = Joi.object({
     "any.required": "Max amount of participants is a required field",
   }),
   imageUrl: Joi.string().required(),
-  allergenes: Joi.string().optional(),
+  allergenes: Joi.any().optional(),
 });
 
 const fetchMealById = (mealId, cookId, callback) => {

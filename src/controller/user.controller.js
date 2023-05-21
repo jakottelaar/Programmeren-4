@@ -90,6 +90,7 @@ const userController = {
     console.log(req.body);
 
     const newUser = {
+      id: input.id,
       firstName: input.firstName,
       lastName: input.lastName,
       street: input.street,
