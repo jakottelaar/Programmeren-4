@@ -1,8 +1,7 @@
 const logger = require("../util/utils").logger;
-const assert = require("assert");
 const pool = require("../util/mysql");
 const Joi = require("joi");
-const { log } = require("console");
+const bcrypt = require("bcrypt");
 
 const schema = Joi.object({
   id: Joi.number().optional(),
@@ -142,58 +141,75 @@ const userController = {
       phoneNumber: input.phoneNumber,
     };
 
-    let sqlStatement = "INSERT INTO user SET ?";
-
-    executeQuery(sqlStatement, newUser, function (error, results, fields) {
-      if (error) {
-        console.log(error);
-        if (error.status === 403) {
-          res.status(403).json({
-            status: 403,
-            message: "Email already exists. User creation failed.",
-            data: {},
-          });
-        } else {
-          res.status(500).json({
-            status: 500,
-            message: "Failed to create new user.",
-            data: {
-              error: error,
-            },
-          });
-        }
-      } else {
-        const createdUserId = results.insertId;
-
-        const selectStatement = "SELECT * FROM user WHERE id = ?";
-        executeQuery(
-          selectStatement,
-          createdUserId,
-          function (error, rows, fields) {
-            if (error) {
-              console.log(error);
-              res.status(500).json({
-                status: 500,
-                message: "Failed to fetch user information.",
-                data: {
-                  error: error,
-                },
-              });
-            } else {
-              const createdUser = rows[0];
-              logger.info("Inserted new user with id:", createdUserId);
-
-              createdUser.isActive = createdUser.isActive === 1 ? true : false;
-
-              res.status(201).json({
-                status: 201,
-                message: "User created successfully.",
-                data: createdUser,
-              });
-            }
-          }
-        );
+    bcrypt.hash(input.password, 10, (err, hashedPassword) => {
+      if (err) {
+        logger.error(err);
+        res.status(500).json({
+          status: 500,
+          message: "Failed to create new user.",
+          data: {
+            error: err,
+          },
+        });
+        return;
       }
+
+      newUser.password = hashedPassword;
+
+      let sqlStatement = "INSERT INTO user SET ?";
+
+      executeQuery(sqlStatement, newUser, function (error, results, fields) {
+        if (error) {
+          console.log(error);
+          if (error.status === 403) {
+            res.status(403).json({
+              status: 403,
+              message: "Email already exists. User creation failed.",
+              data: {},
+            });
+          } else {
+            res.status(500).json({
+              status: 500,
+              message: "Failed to create new user.",
+              data: {
+                error: error,
+              },
+            });
+          }
+        } else {
+          const createdUserId = results.insertId;
+
+          const selectStatement = "SELECT * FROM user WHERE id = ?";
+          executeQuery(
+            selectStatement,
+            createdUserId,
+            function (error, rows, fields) {
+              if (error) {
+                console.log(error);
+                res.status(500).json({
+                  status: 500,
+                  message: "Failed to fetch user information.",
+                  data: {
+                    error: error,
+                  },
+                });
+              } else {
+                const createdUser = rows[0];
+                logger.info("Inserted new user with id:", createdUserId);
+
+                createdUser.isActive =
+                  createdUser.isActive === 1 ? true : false;
+
+                res.status(201).json({
+                  status: 201,
+                  message: "User created successfully.",
+                  data: createdUser,
+                });
+              }
+            }
+          );
+        }
+      });
     });
   },
 
