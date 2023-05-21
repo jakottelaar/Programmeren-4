@@ -371,6 +371,7 @@ describe("UC-204 Opvragen van usergegevens bij ID", () => {
     chai
       .request(server)
       .get(`/api/user/${invalidUserId}`)
+      .set("Authorization", `Bearer ${token}`)
       .end((err, res) => {
         expect(err).to.be.null;
         let { status, message } = res.body;
@@ -387,6 +388,7 @@ describe("UC-204 Opvragen van usergegevens bij ID", () => {
     chai
       .request(server)
       .get(`/api/user/${userId}`)
+      .set("Authorization", `Bearer ${token}`)
       .end((err, res) => {
         expect(err).to.be.null;
 
