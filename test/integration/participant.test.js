@@ -127,7 +127,7 @@ describe("UC-401 Aanmelden voor maaltijd", () => {
       });
   });
 
-  it.only("TC-401-1 Niet ingelogd", (done) => {
+  it("TC-401-1 Niet ingelogd", (done) => {
     chai
       .request(server)
       .post(`/api/meal/${testMealId}/participate`)
@@ -143,7 +143,7 @@ describe("UC-401 Aanmelden voor maaltijd", () => {
       });
   });
 
-  it.only("TC-401-2 Maaltijd bestaat niet", (done) => {
+  it("TC-401-2 Maaltijd bestaat niet", (done) => {
     const nonExistentMealId = testMealId + 1; // ID of a non-existent meal
 
     chai
@@ -167,7 +167,7 @@ describe("UC-401 Aanmelden voor maaltijd", () => {
       });
   });
 
-  it.only("TC-401-3 Succesvol aangemeld", (done) => {
+  it("TC-401-3 Succesvol aangemeld", (done) => {
     chai
       .request(server)
       .post(`/api/meal/${testMealId}/participate`)
@@ -194,7 +194,7 @@ describe("UC-401 Aanmelden voor maaltijd", () => {
 });
 
 describe("UC-402 Afmelden voor maaltijd", (done) => {
-  it.only("TC-402-1 Niet ingelogd", (done) => {
+  it("TC-402-1 Niet ingelogd", (done) => {
     chai
       .request(server)
       .post(`/api/meal/${testMealId}/participate`)
@@ -210,7 +210,7 @@ describe("UC-402 Afmelden voor maaltijd", (done) => {
       });
   });
 
-  it.only("TC-402-2 Maaltijd bestaat niet", (done) => {
+  it("TC-402-2 Maaltijd bestaat niet", (done) => {
     const nonExistentMealId = testMealId + 1;
 
     chai
@@ -234,7 +234,7 @@ describe("UC-402 Afmelden voor maaltijd", (done) => {
       });
   });
 
-  it.only("TC-402-3 Aanmelding bestaat niet", (done) => {
+  it("TC-402-3 Aanmelding bestaat niet", (done) => {
     logger.info(`Participate for meal with id ${testMealId}`);
     chai
       .request(server)
@@ -257,10 +257,10 @@ describe("UC-402 Afmelden voor maaltijd", (done) => {
       });
   });
 
-  it("TC-402-4 should successfully cancel registration for a meal", (done) => {
+  it("TC-402-4 Succesvol afgemeld", (done) => {
     chai
       .request(server)
-      .delete(`/api/participate/${testMealId}`)
+      .delete(`/api/meal/${testMealId}/participate`)
       .set("Authorization", `Bearer ${testToken}`)
       .end((err, res) => {
         expect(res).to.have.status(200);

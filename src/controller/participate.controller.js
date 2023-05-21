@@ -142,7 +142,7 @@ const participateController = {
           } else {
             res.status(200).json({
               status: 200,
-              message: `User met ID ${userId} is afgemeld voor maaltijd met ID ${mealId}`,
+              message: `User with ID ${userId} has been unregistered for meal with ID ${mealId}`,
               data: {},
             });
           }
