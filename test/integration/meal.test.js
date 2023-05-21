@@ -111,7 +111,6 @@ describe("UC-301 Toevoegen van maaltijd", function () {
     chai
       .request(server)
       .post("/api/meal")
-      .set("userid", testUserId)
       .set("Authorization", `Bearer ${testToken}`)
       .send(mealData)
       .end((err, res) => {
