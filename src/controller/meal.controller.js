@@ -87,7 +87,10 @@ const mealController = {
     logger.info(req.body);
 
     const dateTime = DATE_FORMATTER(new Date(), "yyyy-mm-dd HH:MM:ss");
-    const userId = req.headers.userid;
+
+    userId = req.userId;
+
+    logger.info(`CreateMeal UserId: ${userId}`);
 
     const newMeal = {
       name: input.name,
@@ -161,7 +164,7 @@ const mealController = {
 
   updateMealById: (req, res) => {
     const mealId = req.params.mealId;
-    const cookId = req.userid;
+    const cookId = req.userId;
 
     logger.info(cookId);
 
@@ -460,7 +463,7 @@ const mealController = {
 
   deleteMealById: (req, res) => {
     const mealId = parseInt(req.params.mealId);
-    const cookId = req.userid;
+    const cookId = req.userId;
     logger.info(
       `Request for deleting meal with id ${mealId} from user with id ${cookId}`
     );
