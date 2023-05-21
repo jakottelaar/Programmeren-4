@@ -319,21 +319,27 @@ describe("UC-203 Opvragen van gebruikersprofiel", () => {
   });
 
   it("TC-203-2 Gebruiker is ingelogd met geldig token", (done) => {
+    logger.info(`TC-203-2 token ${token}`);
     chai
       .request(server)
       .get("/api/user/profile")
       .set("Authorization", `Bearer ${token}`)
       .end((err, res) => {
-        expect(err).to.be.null;
+        if (err) {
+          logger.error(err);
+        } else {
+          logger.info(res.body);
+          expect(err).to.be.null;
 
-        expect(res).to.have.status(200);
-        expect(res.body).to.be.an("object");
-        let { status, message, data } = res.body;
-        expect(status).to.equal(200);
-        expect(message).to.equal("User profile retrieved successfully");
-        expect(data).to.be.an("object");
+          expect(res).to.have.status(200);
+          expect(res.body).to.be.an("object");
+          let { status, message, data } = res.body;
+          expect(status).to.equal(200);
+          expect(message).to.equal("User profile retrieved successfully");
+          expect(data).to.be.an("object");
 
-        done();
+          done();
+        }
       });
   });
 });
