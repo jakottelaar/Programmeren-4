@@ -148,7 +148,9 @@ const mealController = {
 
     logger.info(`CreateMeal UserId: ${userId}`);
 
-    const allergenes = input.allergenes.join(", ");
+    const allergenes = Array.isArray(input.allergenes)
+      ? input.allergenes.join(", ")
+      : input.allergenes;
 
     const newMeal = {
       id: input.id,
