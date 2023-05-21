@@ -1,9 +1,11 @@
 const express = require("express");
 const participateRouter = express.Router();
 const participantController = require("../controller/participate.controller");
+const loginController = require("../controller/auth.controller");
 
 participateRouter.post(
   "/:mealId/participate",
+  loginController.validateToken,
   participantController.signUpForAMeal
 );
 
