@@ -13,18 +13,20 @@ const expect = chai.expect;
 
 describe("UC-101 inloggen", function () {
   before((done) => {
+    const testUser = {
+      firstName: "Test",
+      lastName: "Tester",
+      emailAddress: "t.estman@mail.com",
+      password: "Password123",
+      street: "123 Main St",
+      city: "Anytown",
+      phoneNumber: "0612345678",
+    };
+
     chai
       .request(server)
       .post("/api/user")
-      .send({
-        firstName: "Test",
-        lastName: "Tester",
-        emailAddress: "t.estman@mail.com",
-        password: "Password123",
-        street: "123 Main St",
-        city: "Anytown",
-        phoneNumber: "0612345678",
-      })
+      .send(testUser)
       .end((err, res) => {
         if (err) {
           logger.error(err);
@@ -42,7 +44,7 @@ describe("UC-101 inloggen", function () {
           expect(data).to.be.an("object");
 
           testEmailAddress = data.emailAddress;
-          testPassword = data.password;
+          testPassword = testUser.password;
           testUserId = data.id;
 
           done();
@@ -147,7 +149,7 @@ describe("UC-101 inloggen", function () {
       .end((err, res) => {
         if (err) {
           logger.error(err);
-          done();
+          done(err);
         } else {
           logger.info(res.body);
           expect(res.body).to.be.an("object");
