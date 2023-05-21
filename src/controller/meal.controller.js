@@ -6,10 +6,10 @@ const DATE_FORMATTER = require("dateformat");
 const createMealSchema = Joi.object({
   name: Joi.string().required(),
   description: Joi.string().required(),
-  isVega: Joi.number().optional(),
-  isVegan: Joi.number().optional(),
-  isToTakeHome: Joi.number().optional(),
-  isActive: Joi.number().optional(),
+  isVega: Joi.any().optional(),
+  isVegan: Joi.any().optional(),
+  isToTakeHome: Joi.any().optional(),
+  isActive: Joi.any().optional(),
   price: Joi.number().required(),
   maxAmountOfParticipants: Joi.number().required(),
   imageUrl: Joi.string().required(),
@@ -240,10 +240,18 @@ const mealController = {
 
               const updatedMeal = results[0];
 
+              const convertedMeal = {
+                ...updatedMeal,
+                isActive: updatedMeal.isActive === 1 ? true : false,
+                isVega: updatedMeal.isVega === 1 ? true : false,
+                isVegan: updatedMeal.isVegan === 1 ? true : false,
+                isToTakeHome: updatedMeal.isToTakeHome === 1 ? true : false,
+              };
+
               res.status(200).json({
                 status: 200,
                 message: "Updated meal",
-                data: updatedMeal,
+                data: convertedMeal,
               });
             }
           );
