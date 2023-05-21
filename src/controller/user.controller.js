@@ -74,6 +74,45 @@ const updateSchema = Joi.object({
     }),
 });
 
+const executeQuery = (sqlStatement, params, callback) => {
+  pool.getConnection((err, connection) => {
+    if (err) {
+      logger.error("Error getting connection from pool");
+      callback({
+        status: 500,
+        message: err.code,
+        data: {},
+      });
+      return;
+    }
+
+    connection.query(sqlStatement, params, (error, results, fields) => {
+      connection.release(); // Release the connection back to the pool
+
+      if (error) {
+        if (error.code === "ER_DUP_ENTRY") {
+          callback({
+            status: 403,
+          });
+        } else {
+          logger.error(error);
+
+          callback({
+            status: 500,
+            message: "Failed to execute query",
+            data: {
+              error,
+            },
+          });
+        }
+        return;
+      }
+
+      callback(null, results, fields);
+    });
+  });
+};
+
 const userController = {
   //Post request for registration of a new user
   createNewUser: (req, res) => {
@@ -105,10 +144,10 @@ const userController = {
 
     let sqlStatement = "INSERT INTO user SET ?";
 
-    pool.query(sqlStatement, newUser, function (error, results, fields) {
+    executeQuery(sqlStatement, newUser, function (error, results, fields) {
       if (error) {
         console.log(error);
-        if (error.code === "ER_DUP_ENTRY") {
+        if (error.status === 403) {
           res.status(403).json({
             status: 403,
             message: "Email already exists. User creation failed.",
@@ -127,7 +166,7 @@ const userController = {
         const createdUserId = results.insertId;
 
         const selectStatement = "SELECT * FROM user WHERE id = ?";
-        pool.query(
+        executeQuery(
           selectStatement,
           createdUserId,
           function (error, rows, fields) {
@@ -157,6 +196,7 @@ const userController = {
       }
     });
   },
+
   //Get request for getting all the users from the mysql database
   getAllUsers: (req, res) => {
     const filters = req.query;
@@ -179,7 +219,7 @@ const userController = {
       }
     }
 
-    pool.query(sqlStatement, values, function (error, results, fields) {
+    executeQuery(sqlStatement, values, function (error, results, fields) {
       if (error) {
         console.log(error);
         res.status(500).json({
@@ -213,7 +253,7 @@ const userController = {
 
     let selectUserSqlStatement = "SELECT * FROM `user` WHERE id = ?";
 
-    pool.query(
+    executeQuery(
       selectUserSqlStatement,
       [userId],
       function (error, results, fields) {
@@ -247,13 +287,14 @@ const userController = {
       }
     );
   },
+
   //Get request for getting a user by their id
   getUserById: (req, res) => {
     const userId = parseInt(req.params.userId);
 
     let sqlStatement = "SELECT * FROM user WHERE id = ?";
 
-    pool.query(sqlStatement, userId, function (error, results, fields) {
+    executeQuery(sqlStatement, [userId], function (error, results, fields) {
       if (error) {
         console.log(error);
         res.status(500).json({
@@ -282,6 +323,7 @@ const userController = {
       }
     });
   },
+
   //Put request for updating a user's profile
   updateUser: (req, res) => {
     const userId = parseInt(req.params.userId);
@@ -289,7 +331,7 @@ const userController = {
 
     // Check if the user exists
     let selectUserSqlStatement = "SELECT * FROM `user` WHERE id = ?";
-    pool.query(
+    executeQuery(
       selectUserSqlStatement,
       [userId],
       function (dbError, results, fields) {
@@ -353,7 +395,7 @@ const userController = {
 
         let sqlStatement = "UPDATE user SET ? WHERE id = ?";
 
-        pool.query(
+        executeQuery(
           sqlStatement,
           [filteredInput, userId],
           function (error, results, fields) {
@@ -375,7 +417,7 @@ const userController = {
             } else {
               logger.info(`Updated user by id: ${userId}`);
               let selectStatement = "SELECT * FROM user WHERE id = ?";
-              pool.query(
+              executeQuery(
                 selectStatement,
                 userId,
                 function (error, results, fields) {
@@ -413,7 +455,7 @@ const userController = {
 
     let sqlStatement = "DELETE FROM user WHERE id = ?";
 
-    pool.query(sqlStatement, userId, function (error, results, fields) {
+    executeQuery(sqlStatement, userId, function (error, results, fields) {
       if (error) {
         console.log(error);
         res.status(500).json({
