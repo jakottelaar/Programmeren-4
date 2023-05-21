@@ -162,6 +162,30 @@ describe("UC-402 Afmelden voor maaltijd", (done) => {
         done();
       });
   });
+
+  it.only("TC-402-2 Maaltijd bestaat niet", (done) => {
+    const nonExistentMealId = testMealId + 1;
+
+    chai
+      .request(server)
+      .post(`/api/meal/${nonExistentMealId}/participate`)
+      .set("Authorization", `Bearer ${testToken}`)
+      .end((err, res) => {
+        if (err) {
+          logger.error(err);
+        } else {
+          logger.info(res.body);
+          expect(res.body).to.be.an("object");
+          expect(res.body.status).to.equal(404);
+          expect(res.body.message).to.equal(
+            `No meal with ID ${nonExistentMealId} found`
+          );
+          expect(res.body.data).to.be.an("object").that.is.empty;
+
+          done();
+        }
+      });
+  });
 });
 
 after((done) => {
