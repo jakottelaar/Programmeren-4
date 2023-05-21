@@ -97,7 +97,7 @@ describe("UC-401 Aanmelden voor maaltijd", () => {
                               price: 9.99,
                               maxAmountOfParticipants: 10,
                               imageUrl: "https://example.com/test-meal.jpg",
-                              allergenes: "gluten",
+                              allergenes: ["gluten"],
                             };
 
                             chai

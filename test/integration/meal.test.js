@@ -105,7 +105,7 @@ describe("UC-301 Toevoegen van maaltijd", function () {
       price: 10.99,
       maxAmountOfParticipants: 20,
       imageUrl: "https://example.com/meal-image.jpg",
-      allergenes: "gluten",
+      allergenes: ["gluten"],
     };
 
     chai
@@ -142,7 +142,7 @@ describe("UC-301 Toevoegen van maaltijd", function () {
       price: 10.99,
       maxAmountOfParticipants: 20,
       imageUrl: "https://example.com/meal-image.jpg",
-      allergenes: "gluten",
+      allergenes: ["gluten"],
     };
     chai
       .request(server)
@@ -173,7 +173,7 @@ describe("UC-301 Toevoegen van maaltijd", function () {
       price: 10.99,
       maxAmountOfParticipants: 20,
       imageUrl: "https://example.com/meal-image.jpg",
-      allergenes: "gluten",
+      allergenes: ["gluten"],
     };
 
     chai
@@ -231,7 +231,7 @@ describe("UC-302 Wijzigen van maaltijdsgegevens", function () {
       price: 10.99,
       maxAmountOfParticipants: 20,
       imageUrl: "https://example.com/meal-image.jpg",
-      allergenes: "gluten",
+      allergenes: ["gluten"],
     };
 
     chai
@@ -267,7 +267,7 @@ describe("UC-302 Wijzigen van maaltijdsgegevens", function () {
       price: 10.99,
       maxAmountOfParticipants: 20,
       imageUrl: "https://example.com/meal-image.jpg",
-      allergenes: "gluten",
+      allergenes: ["gluten"],
     };
     chai
       .request(server)
@@ -297,7 +297,7 @@ describe("UC-302 Wijzigen van maaltijdsgegevens", function () {
       price: 10.99,
       maxAmountOfParticipants: 20,
       imageUrl: "https://example.com/meal-image.jpg",
-      allergenes: "gluten",
+      allergenes: ["gluten"],
     };
 
     chai
@@ -331,7 +331,7 @@ describe("UC-302 Wijzigen van maaltijdsgegevens", function () {
       price: 10.99,
       maxAmountOfParticipants: 20,
       imageUrl: "https://example.com/meal-image.jpg",
-      allergenes: "gluten",
+      allergenes: ["gluten"],
     };
 
     chai
@@ -359,7 +359,7 @@ describe("UC-302 Wijzigen van maaltijdsgegevens", function () {
       price: 10.99,
       maxAmountOfParticipants: 20,
       imageUrl: "https://example.com/meal-image.jpg",
-      allergenes: "gluten",
+      allergenes: ["gluten"],
     };
 
     chai

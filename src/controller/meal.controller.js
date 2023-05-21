@@ -16,7 +16,9 @@ const createMealSchema = Joi.object({
   price: Joi.number().required(),
   maxAmountOfParticipants: Joi.number().required(),
   imageUrl: Joi.string().required(),
-  allergenes: Joi.any().optional(),
+  allergenes: Joi.array()
+    .items(Joi.string().valid("gluten", "lactose", "noten"))
+    .optional(),
 });
 
 const updateMealSchema = Joi.object({
@@ -38,7 +40,9 @@ const updateMealSchema = Joi.object({
     "any.required": "Max amount of participants is a required field",
   }),
   imageUrl: Joi.string().required(),
-  allergenes: Joi.any().optional(),
+  allergenes: Joi.array()
+    .items(Joi.string().valid("gluten", "lactose", "noten"))
+    .optional(),
 });
 
 const fetchMealById = (mealId, cookId, callback) => {
@@ -144,13 +148,11 @@ const mealController = {
 
     const dateTime = DATE_FORMATTER(new Date(), "yyyy-mm-dd HH:MM:ss");
 
+    const allergenes = input.allergenes ? input.allergenes.join(",") : "";
+
     const userId = req.userId;
 
     logger.info(`CreateMeal UserId: ${userId}`);
-
-    const allergenes = Array.isArray(input.allergenes)
-      ? input.allergenes.join(", ")
-      : input.allergenes;
 
     const newMeal = {
       id: input.id,
