@@ -345,6 +345,26 @@ describe("UC-203 Opvragen van gebruikersprofiel", () => {
 });
 
 describe("UC-204 Opvragen van usergegevens bij ID", () => {
+  it("TC-204-1 Ongeldig token", (done) => {
+    chai
+      .request(server)
+      .get(`/api/user/${userId}`)
+      .set("Authorization", `Bearer ${token}`)
+      .end((err, res) => {
+        expect(err).to.be.null;
+
+        console.log(res.body);
+        expect(res.body).to.be.an("object");
+        let { status, message, data } = res.body;
+
+        expect(status).to.equal(200);
+        expect(message).to.equal("User retrieved by id successfully.");
+        expect(data).to.be.an("object");
+
+        done();
+      });
+  });
+
   it("TC-204-2 Gebruiker-ID bestaat niet", (done) => {
     const invalidUserId = userId + 1;
 

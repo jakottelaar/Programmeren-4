@@ -15,7 +15,11 @@ userRouter.get(
   loginController.validateToken,
   userController.getUserProfile
 );
-userRouter.get("/:userId", userController.getUserById);
+userRouter.get(
+  "/:userId",
+  loginController.validateToken,
+  userController.getUserById
+);
 userRouter.delete("/:userId", userController.deleteUser);
 
 module.exports = userRouter;
