@@ -94,7 +94,7 @@ describe("UC-101 inloggen", function () {
           expect(res.body).to.have.property("status").to.equal(400);
           expect(res.body)
             .to.have.property("message")
-            .to.equal("Invalid password");
+            .to.equal("Password is not valid.");
           expect(res.body).to.have.property("data");
 
           const { data, message } = res.body;
@@ -112,7 +112,7 @@ describe("UC-101 inloggen", function () {
       .post("/api/login")
       .send({
         emailAddress: "nonexistentuser@example.com",
-        password: "password123",
+        password: "Password123",
       })
       .end((err, res) => {
         if (err) {

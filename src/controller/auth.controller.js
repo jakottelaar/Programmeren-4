@@ -103,9 +103,13 @@ module.exports = {
         .messages({ "any.required": `Email address is required` }),
       emailAdress: Joi.string().optional(),
       password: Joi.string()
+        .pattern(/^(?=.*[A-Z])(?=.*\d).{8,}$/)
         .required()
         .label("Password")
-        .messages({ "any.required": `Password is required` }),
+        .messages({
+          "any.required": `Password is required`,
+          "string.pattern.base": `Password is not valid.`,
+        }),
     });
 
     const { error } = schema.validate(req.body);
