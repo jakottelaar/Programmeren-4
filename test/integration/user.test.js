@@ -349,7 +349,6 @@ describe("UC-204 Opvragen van usergegevens bij ID", () => {
     chai
       .request(server)
       .get(`/api/user/${userId}`)
-      .set("Authorization", `Bearer ${token}`)
       .end((err, res) => {
         expect(err).to.be.null;
 
@@ -357,8 +356,8 @@ describe("UC-204 Opvragen van usergegevens bij ID", () => {
         expect(res.body).to.be.an("object");
         let { status, message, data } = res.body;
 
-        expect(status).to.equal(200);
-        expect(message).to.equal("User retrieved by id successfully.");
+        expect(status).to.equal(401);
+        expect(message).to.equal("Unauthorized: Missing or invalid token");
         expect(data).to.be.an("object");
 
         done();
