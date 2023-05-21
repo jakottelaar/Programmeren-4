@@ -38,6 +38,40 @@ const schema = Joi.object({
     }),
 });
 
+const updateSchema = Joi.object({
+  firstName: Joi.string().optional(),
+  lastName: Joi.string().min(2).optional(),
+  street: Joi.string().allow("").optional(),
+  city: Joi.string().allow("").optional(),
+  isActive: Joi.boolean().optional(),
+  emailAdress: Joi.any().optional(),
+  emailAddress: Joi.string()
+    .pattern(
+      new RegExp(/^[a-zA-Z]\.[a-zA-Z0-9]{2,}@([a-zA-Z]{2,}\.[a-zA-Z]{2,3})$/)
+    )
+    .required()
+    .messages({
+      "string.pattern.base": `Email address is not valid`,
+    }),
+  password: Joi.string()
+    .pattern(/^(?=.*[A-Z])(?=.*\d).{8,}$/)
+    .optional()
+    .messages({
+      "string.empty": `Password address cannot be empty`,
+      "any.required": `Password is required`,
+      "string.pattern.base": `Password is not valid. It should be at least 8 characters and contain at least one uppercase letter and one digit.`,
+    }),
+  phoneNumber: Joi.string()
+    .pattern(/^(06[-\s]?\d{8}|\d{10,11})$/)
+    .optional()
+    .messages({
+      "string.empty": `Phone number cannot be empty`,
+      "any.required": `Phone number is required`,
+      "string.pattern.base": `Phone number is not valid. It should start with '06' and be followed by 8 digits.`,
+      "string.length": `Phone number should be either 10 or 11 digits long.`,
+    }),
+});
+
 const userController = {
   //Post request for registration of a new user
   createNewUser: (req, res) => {
@@ -248,90 +282,128 @@ const userController = {
   //Put request for updating a user's profile
   updateUser: (req, res) => {
     const userId = parseInt(req.params.userId);
+    const requesterUserId = req.userId;
 
-    const { error, value: input } = schema.validate(req.body);
-
-    if (error) {
-      logger.error(error);
-      res.status(400).json({
-        status: 400,
-        message: error.message,
-        data: {},
-      });
-      return;
-    }
-
-    const allowedFields = [
-      "firstName",
-      "lastName",
-      "street",
-      "city",
-      "isActive",
-      "emailAddress",
-      "password",
-      "phoneNumber",
-    ];
-
-    const filteredInput = Object.keys(input)
-      .filter((key) => allowedFields.includes(key))
-      .reduce((obj, key) => {
-        obj[key] = input[key];
-        return obj;
-      }, {});
-
-    let sqlStatement = "UPDATE user SET ? WHERE id = ?";
-
+    // Check if the user exists
+    let selectUserSqlStatement = "SELECT * FROM `user` WHERE id = ?";
     pool.query(
-      sqlStatement,
-      [filteredInput, userId],
-      function (error, results, fields) {
-        if (error) {
-          console.log(error);
-          res.status(500).json({
+      selectUserSqlStatement,
+      [userId],
+      function (dbError, results, fields) {
+        if (dbError) {
+          logger.error(dbError);
+          return res.status(500).json({
             status: 500,
-            message: "Error updating user",
+            message: "Failed to fetch user profile",
             data: {
-              error: error,
+              dbError,
             },
           });
-        } else if (results.affectedRows === 0) {
-          res.status(404).json({
+        }
+
+        if (results.length === 0) {
+          return res.status(404).json({
             status: 404,
             message: `No user with ID ${userId}`,
             data: {},
           });
-        } else {
-          logger.info(`Updated user by id: ${userId}`);
-          let selectStatement = "SELECT * FROM user WHERE id = ?";
-          pool.query(
-            selectStatement,
-            userId,
-            function (error, results, fields) {
-              if (error) {
-                console.log(error);
-                res.status(500).json({
-                  status: 500,
-                  message: "Error retrieving updated user information",
-                  data: {
-                    error: error,
-                  },
-                });
-              } else {
-                const updatedUserInfo = results[0];
-                updatedUserInfo.isActive =
-                  updatedUserInfo.isActive === 1 ? true : false;
-                res.status(200).json({
-                  status: 200,
-                  message: "Updated user",
-                  data: updatedUserInfo,
-                });
-              }
-            }
-          );
         }
+
+        // Check if the user is the owner
+        if (userId !== requesterUserId) {
+          return res.status(403).json({
+            status: 403,
+            message: "You are not authorized to update this user's data.",
+            data: {},
+          });
+        }
+
+        const { error, value: input } = updateSchema.validate(req.body);
+
+        if (error) {
+          logger.error(error);
+          res.status(400).json({
+            status: 400,
+            message: error.message,
+            data: {},
+          });
+          return;
+        }
+
+        const allowedFields = [
+          "firstName",
+          "lastName",
+          "street",
+          "city",
+          "isActive",
+          "emailAddress",
+          "password",
+          "phoneNumber",
+        ];
+
+        const filteredInput = Object.keys(input)
+          .filter((key) => allowedFields.includes(key))
+          .reduce((obj, key) => {
+            obj[key] = input[key];
+            return obj;
+          }, {});
+
+        let sqlStatement = "UPDATE user SET ? WHERE id = ?";
+
+        pool.query(
+          sqlStatement,
+          [filteredInput, userId],
+          function (error, results, fields) {
+            if (error) {
+              console.log(error);
+              res.status(500).json({
+                status: 500,
+                message: "Error updating user",
+                data: {
+                  error: error,
+                },
+              });
+            } else if (results.affectedRows === 0) {
+              res.status(404).json({
+                status: 404,
+                message: `No user with ID ${userId}`,
+                data: {},
+              });
+            } else {
+              logger.info(`Updated user by id: ${userId}`);
+              let selectStatement = "SELECT * FROM user WHERE id = ?";
+              pool.query(
+                selectStatement,
+                userId,
+                function (error, results, fields) {
+                  if (error) {
+                    console.log(error);
+                    res.status(500).json({
+                      status: 500,
+                      message: "Error retrieving updated user information",
+                      data: {
+                        error: error,
+                      },
+                    });
+                  } else {
+                    const updatedUserInfo = results[0];
+                    updatedUserInfo.isActive =
+                      updatedUserInfo.isActive === 1 ? true : false;
+                    res.status(200).json({
+                      status: 200,
+                      message: "Updated user",
+                      data: updatedUserInfo,
+                    });
+                  }
+                }
+              );
+            }
+          }
+        );
       }
     );
   },
+
   //Delete request for deleting a user by id
   deleteUser: (req, res) => {
     const userId = parseInt(req.params.userId);
