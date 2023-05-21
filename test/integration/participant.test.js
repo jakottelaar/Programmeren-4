@@ -10,9 +10,6 @@ let testMealId = 0;
 let testToken = 0;
 let testUserId = 0;
 
-let testToken2 = 0;
-let testUserId2 = 0;
-
 describe("UC-401 Aanmelden voor maaltijd", () => {
   before((done) => {
     const testUser1 = {
@@ -35,6 +32,7 @@ describe("UC-401 Aanmelden voor maaltijd", () => {
           done(err);
         } else {
           testUserId = res.body.data.id;
+          logger.info(`Participate test user created with id ${testUserId}`);
 
           chai
             .request(server)
@@ -82,7 +80,7 @@ describe("UC-401 Aanmelden voor maaltijd", () => {
       });
   });
 
-  it.only("TC-401-1 Niet ingelogd", (done) => {
+  it("TC-401-1 Niet ingelogd", (done) => {
     chai
       .request(server)
       .post(`/api/meal/${testMealId}/participate`)
@@ -98,7 +96,7 @@ describe("UC-401 Aanmelden voor maaltijd", () => {
       });
   });
 
-  it.only("TC-401-2 Maaltijd bestaat niet", (done) => {
+  it("TC-401-2 Maaltijd bestaat niet", (done) => {
     const nonExistentMealId = testMealId + 1; // ID of a non-existent meal
 
     chai
@@ -106,35 +104,67 @@ describe("UC-401 Aanmelden voor maaltijd", () => {
       .post(`/api/meal/${nonExistentMealId}/participate`)
       .set("Authorization", `Bearer ${testToken}`)
       .end((err, res) => {
-        expect(res.body).to.be.an("object");
-        expect(res.body.status).to.equal(404);
-        expect(res.body.message).to.equal(
-          `No meal with ID ${nonExistentMealId} found`
-        );
-        expect(res.body.data).to.be.an("object").that.is.empty;
+        if (err) {
+          logger.error(err);
+        } else {
+          logger.info(res.body);
+          expect(res.body).to.be.an("object");
+          expect(res.body.status).to.equal(404);
+          expect(res.body.message).to.equal(
+            `No meal with ID ${nonExistentMealId} found`
+          );
+          expect(res.body.data).to.be.an("object").that.is.empty;
 
-        done();
+          done();
+        }
+      });
+  });
+
+  it("TC-401-3 Succesvol aangemeld", (done) => {
+    chai
+      .request(server)
+      .post(`/api/meal/${testMealId}/participate`)
+      .set("Authorization", `Bearer ${testToken}`)
+      .end((err, res) => {
+        if (err) {
+          logger.error(err);
+        } else {
+          logger.info(res.body);
+          expect(res.body).to.be.an("object");
+          expect(res.body).to.have.property("status").to.equal(200);
+          expect(res.body)
+            .to.have.property("message")
+            .to.equal(
+              `User with ID ${testUserId} has been signed up for meal with ID ${testMealId}`
+            );
+          expect(res.body).to.have.property("data").to.be.an("object").that.is
+            .not.empty;
+
+          done();
+        }
       });
   });
 });
-after((done) => {
-  chai
-    .request(server)
-    .delete(`/api/user/${testUserId}`)
-    .end((err, res) => {
-      if (err) {
-        logger.error(err);
-      }
-    });
 
+after((done) => {
   chai
     .request(server)
     .delete(`/api/meal/${testMealId}`)
     .set("Authorization", `Bearer ${testToken}`)
-    .end((err, res) => {
-      if (err) {
-        logger.error(err);
+    .end((mealErr, mealRes) => {
+      if (mealErr) {
+        logger.error(mealErr);
       }
-      done();
+
+      chai
+        .request(server)
+        .delete(`/api/user/${testUserId}`)
+        .end((userErr, userRes) => {
+          if (userErr) {
+            logger.error(userErr);
+          }
+
+          done();
+        });
     });
 });

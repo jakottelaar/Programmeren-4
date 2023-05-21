@@ -30,7 +30,7 @@ const fetchMealById = (mealId, callback) => {
 const participateController = {
   signUpForAMeal: (req, res) => {
     const mealId = parseInt(req.params.mealId);
-    const userId = req.headers.userid;
+    const userId = req.userId;
 
     fetchMealById(mealId, (error, meal) => {
       if (error) {
