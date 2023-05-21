@@ -22,6 +22,7 @@ This project utilizes the following libraries:
 * express: Web framework for building APIs.
 * tracer: Logging library for generating logs.
 * dotenv: Library for loading environment variables from a .env file.
+* bcrypt: Library for hashing passwords and comparing hashed passwords for secure password storage.
 
 #### Installation
 
@@ -44,7 +45,4 @@ JWT_SECRET_KEY=your_secret_key
 ```
 ### API Documentation
 To understand the available endpoints and their functionalities, please refer to the API documentation created with Postman.
-
-This will provide a direct link to your Postman documentation where users can explore and interact with the available endpoints.
-
 https://documenter.getpostman.com/view/26588588/2s93m1b5Fe
