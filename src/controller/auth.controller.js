@@ -66,6 +66,8 @@ module.exports = {
             });
           }
 
+          delete user.password;
+
           // Create payload
           const payload = {
             userId: user.id,
@@ -78,7 +80,7 @@ module.exports = {
             status: 200,
             message: "Login successful",
             data: {
-              results,
+              user,
               token,
             },
           });
