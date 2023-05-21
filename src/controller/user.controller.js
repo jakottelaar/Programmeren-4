@@ -205,9 +205,7 @@ const userController = {
         res.status(200).json({
           status: 200,
           message: "User profile retrieved successfully",
-          data: {
-            user: user,
-          },
+          data: user,
         });
       }
     );
